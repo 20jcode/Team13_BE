@@ -64,7 +64,7 @@ public class SecurityConfig {
             })
             .authenticationEntryPoint((request, response, authException) -> {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "인증 실패");
-            }));
+            })); //TODO : 예외처리 핸들링을 global exception으로 넘겨서 처리될 수 있도록 변경 필요
         return http.build();
     }
 

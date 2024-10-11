@@ -25,7 +25,7 @@ public @interface DbdrAuth {
     Role role();
     AuthParam type();
     String id() default "";
-
+    //TODO : 정상작동 테스트 해봐야함. 특히 ID 부분이 String으로 넘어가는 것 유의하기
 }
 
 

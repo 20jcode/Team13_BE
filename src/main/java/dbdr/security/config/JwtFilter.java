@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 jwtProvider.validateToken(token);
                 Authentication authentication = jwtProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (Exception e) {
+            } catch (Exception e) { //TODO : 왜 실패하였는 지 클라이언트 측에 상세한 정보 넘겨주기
                 log.debug("토큰 유저 정보 추출 실패 : {}", e.getMessage());
             }
         }

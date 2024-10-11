@@ -51,7 +51,7 @@ public class JwtProvider {
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + expireTime))
             .signWith(secretKey).compact();
-    }
+    } //TODO : refresh token 구현하고 로그아웃 필터까지 추가하기
 
     public Authentication getAuthentication(String token) {
         BaseUserDetails userDetails = baseUserDetailsService.loadUserByUsernameAndRole(
