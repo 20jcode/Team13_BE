@@ -28,20 +28,14 @@ public class BaseUserDetailsService {
 
     public BaseUserDetails loadUserByUsernameAndRole(String username, Role role) {
 
-        if (role == Role.GUARDIAN) {
-            return getGuadianDetails(username);
-        }
-        if (role == Role.CAREWORKER) {
-            return getCareWorkerDetails(username);
-        }
-        if (role == Role.INSTITUTION) {
-            return getInstitutionDetails(username);
-        }
-        if (role == Role.ADMIN) {
-            return getAdminDetails(username);
-        }
+        return switch (role) {
+            case GUARDIAN -> getGuadianDetails(username);
+            case CAREWORKER -> getCareWorkerDetails(username);
+            case INSTITUTION -> getInstitutionDetails(username);
+            case ADMIN -> getAdminDetails(username);
+            default -> throw new ApplicationException(ApplicationError.ROLE_NOT_FOUND);
+        };
 
-        throw new ApplicationException(ApplicationError.ROLE_NOT_FOUND);
     }
 
     private BaseUserDetails getInstitutionDetails(String userId) {

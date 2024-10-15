@@ -26,10 +26,14 @@ public class BaseAuthenticationProvider implements AuthenticationProvider {
         BaseUserDetails unAuthUser = (BaseUserDetails) authentication.getPrincipal();
         BaseUserDetails authUser = baseUserDetailsService.loadUserByUsernameAndRole(unAuthUser.getUserLoginId(), unAuthUser.getRole());
 
+        checkPassword(unAuthUser, authUser);
+        return new UsernamePasswordAuthenticationToken(authUser, authUser.getPassword(), authUser.getAuthorities());
+    }
+
+    private void checkPassword(BaseUserDetails unAuthUser, BaseUserDetails authUser) {
         if (!passwordEncoder.matches(unAuthUser.getPassword(), authUser.getPassword())) {
             throw new ApplicationException(ApplicationError.PASSWORD_NOT_MATCH);
         }
-        return new UsernamePasswordAuthenticationToken(authUser, authUser.getPassword(), authUser.getAuthorities());
     }
 
     @Override
