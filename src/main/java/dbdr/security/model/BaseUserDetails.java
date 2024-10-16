@@ -14,16 +14,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class BaseUserDetails implements UserDetails {
 
-    private final Long id; //db pk
-    private final String userLoginId; //로그인 시 사용할 id
+    private final Long id;
+    private final String userLoginId;
     private final String password;
-    private final String role; //TODO : role에 대해서 String으로 Role 클래스로 처리할 수 있도록?
-    private final Long institutionId; //TODO : 회원식별에 요양원ID이외의 값이 필요없는지?
+    private final Role role;
+    private final Long institutionId;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collection = new ArrayList<>();
-        collection.add((GrantedAuthority) () -> role);
+        collection.add((GrantedAuthority) () -> String.valueOf(role));
         return collection;
     }
 
@@ -37,7 +38,4 @@ public class BaseUserDetails implements UserDetails {
         return userLoginId;
     }
 
-    public Role getRole() {
-        return Role.valueOf(role);
-    }
 }
