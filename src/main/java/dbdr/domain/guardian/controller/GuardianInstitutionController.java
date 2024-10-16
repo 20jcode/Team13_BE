@@ -32,7 +32,7 @@ public class GuardianInstitutionController {
         List<GuardianResponse> guardianResponseList = guardianService.getAllGuardian();
         return ResponseEntity.ok(guardianResponseList);
     }
-    @DbdrAuth(role = Role.INSTITUTION,type= AuthParam.GUARDIAN_ID,id="#guardianId")
+    @DbdrAuth(targetRole = Role.INSTITUTION,type= AuthParam.GUARDIAN_ID,id="#guardianId")
     @GetMapping("/{guardianId}")
     public ResponseEntity<GuardianResponse> showOneGuardian(
         @PathVariable("guardianId") Long guardianId) {

@@ -23,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public @interface DbdrAuth {
     Role targetRole();
     AuthParam type();
-    long id();
+    String id();
 }
 
 
