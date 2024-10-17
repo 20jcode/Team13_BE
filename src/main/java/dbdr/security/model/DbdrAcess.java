@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DbdrAcess {
 
-    public boolean hasAccessPermission(BaseUserDetails userDetails, BaseEntity baseEntity) {
+    public boolean hasAccessPermission(Role role,BaseUserDetails userDetails, BaseEntity baseEntity) {
 
-        if (userDetails.getRole().equals(Role.ADMIN)) { //ADMIN 권한이면 모든 권한을 가짐
-            return true;
+        if(!hasRequiredRole(role, userDetails)){
+            return false;
         }
         if (baseEntity instanceof Institution) {
             return hasAccessPermission(userDetails, (Institution) baseEntity);
@@ -34,18 +34,32 @@ public class DbdrAcess {
         return false;
     }
 
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Institution institution) {
-        if (isInstitution(userDetails)) {
-            return userDetails.getInstitutionId().equals(institution.getId());
+
+    private boolean hasRequiredRole(Role role, BaseUserDetails userDetails) {
+        if (role.equals(Role.ADMIN)){
+            return userDetails.isAdmin();
         }
-        return false; //careworker나 guardian일 경우 url에서 Institution의 ID로 접근하는 것 자체가 잘못되었다 생각
+        if (role.equals(Role.INSTITUTION) && (userDetails.isAdmin() || userDetails.isInstitution())){
+            return true;
+        }
+        if (role.equals(Role.CAREWORKER) && (!userDetails.isGuardian())){
+            return true;
+        }
+        if (role.equals(Role.GUARDIAN) && (!userDetails.isCareworker())){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasAccessPermission(BaseUserDetails userDetails, Institution institution) {
+        return userDetails.getInstitutionId().equals(institution.getId());
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Careworker careworker) {
-        if (isInstitution(userDetails)) {
+        if (userDetails.isInstitution()) {
             return userDetails.getInstitutionId().equals(careworker.getInstitutionId());
         }
-        if (isCareworker(userDetails)) {
+        if (userDetails.isCareworker()) {
             return userDetails.getId().equals(careworker.getId());
         }
         return false;
@@ -53,59 +67,38 @@ public class DbdrAcess {
 
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Guardian guardian) {
-        if (isInstitution(userDetails)) {
+        if (userDetails.isInstitution()) {
             return userDetails.getInstitutionId().equals(guardian.getInstitutionId());
         }
-        if(isGuardian(userDetails)){
+        if(userDetails.isGuardian()){
             return userDetails.getId().equals(guardian.getId());
         }
         return false;
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Chart chart) {
-        if(isInstitution(userDetails)){
-            return userDetails.getInstitutionId().equals(chart.getRecipient().getInstitutionNumber());
+        if(userDetails.isInstitution()){
+            return userDetails.getInstitutionId().equals(chart.getInstitutionId());
         }
-        if(isCareworker(userDetails)){
-            return userDetails.getId().equals(chart.getRecipient().getCareworker().getId());
-        }
-        if(isGuardian(userDetails)){
-            return false;
-            //TODO : 환자와 보호자 간의 mapping 필요
-            //return userDetails.getId().equals(chart.getRecipient().getGuardian().getId());
+        if(userDetails.isCareworker()){
+            return userDetails.getId().equals(chart.getCareworker().getId());
         }
         return false;
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Recipient recipient) {
         //TODO : chart와 recipient사이 관계가 있으므로 리팩토링 가능
-        if(isInstitution(userDetails)){
+        if(userDetails.isAdmin()){
             return userDetails.getInstitutionId().equals(recipient.getInstitutionNumber());
         }
-        if(isCareworker(userDetails)){
+        if(userDetails.isCareworker()){
             return userDetails.getId().equals(recipient.getCareworker().getId());
         }
-        if(isGuardian(userDetails)){
+        if(userDetails.isGuardian()){
             return false;
             //TODO : 환자와 보호자 간의 mapping 필요
             //return userDetails.getId().equals(recipient.getGuardian().getId());
         }
         return false;
     }
-
-    private boolean isInstitution(BaseUserDetails userDetails) {
-        return userDetails.getRole().equals(Role.INSTITUTION);
-    }
-
-    private static boolean isCareworker(BaseUserDetails userDetails) {
-        return userDetails.getRole().equals(Role.CAREWORKER);
-    }
-
-    private static boolean isGuardian(BaseUserDetails userDetails) {
-        return userDetails.getRole().equals(Role.GUARDIAN);
-    }
-
-
-
-
 }

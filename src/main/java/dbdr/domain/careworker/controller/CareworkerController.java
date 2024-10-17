@@ -3,12 +3,14 @@ package dbdr.domain.careworker.controller;
 import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
 import dbdr.domain.careworker.dto.response.CareworkerResponseDTO;
 import dbdr.domain.careworker.service.CareworkerService;
+import dbdr.security.model.AuthParam;
+import dbdr.security.model.DbdrAuth;
+import dbdr.security.model.Role;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -17,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/${spring.app.version}/careworker")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyAuthority('ADMIN')")
 public class CareworkerController {
 
     private final CareworkerService careworkerService;
@@ -26,6 +27,7 @@ public class CareworkerController {
     private String appVersion;
 
     @GetMapping
+    @DbdrAuth(targetRole = Role.CAREWORKER, type = AuthParam.CAREWORKER_ID,id = "#institutionId")
     public ResponseEntity<List<CareworkerResponseDTO>> getAllCareworkers(
         @RequestParam(value = "institutionId", required = false) Long institutionId) {
         List<CareworkerResponseDTO> careworkerList;

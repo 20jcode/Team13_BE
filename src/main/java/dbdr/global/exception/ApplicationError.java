@@ -13,6 +13,7 @@ public enum ApplicationError {
     ACCESS_NOT_ALLOWED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    ILLIGAL_ARGUMENT(HttpStatus.INTERNAL_SERVER_ERROR, "인증 과정 중 문제가 생겼습니다."),
 
     // Guardian (보호자)
     GUARDIAN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 보호자를 찾을 수가 없습니다."),
@@ -25,6 +26,9 @@ public enum ApplicationError {
 
     // Institution (요양원)
     INSTITUTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 요양원을 찾을 수가 없습니다."),
+
+    // Chart (차트)
+    CHART_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 차트을 찾을 수가 없습니다."),
 
     // 공통
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),

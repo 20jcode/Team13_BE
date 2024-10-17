@@ -43,8 +43,7 @@ public class BaseUserDetailsService {
             throw new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND);
         }
 
-        Institution institution = institutionRepository.findByInstitutionNumber(
-            Long.parseLong(userId));
+        Institution institution = institutionRepository.findByInstitutionNumber(Long.parseLong(userId));
 
         return securityRegister(institution.getId(), institution.getInstitutionNumber().toString(),
             institution.getLoginPassword(), Role.INSTITUTION);
@@ -75,7 +74,7 @@ public class BaseUserDetailsService {
 
     private BaseUserDetails securityRegister(Long id, String username, String password, Role role) {
         BaseUserDetails userDetails = BaseUserDetails.builder().id(id).userLoginId(username)
-            .password(password).role(role.name()).build();
+            .password(password).role(role).build();
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
             userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
