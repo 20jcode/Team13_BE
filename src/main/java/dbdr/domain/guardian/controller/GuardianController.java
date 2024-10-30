@@ -1,16 +1,15 @@
 package dbdr.domain.guardian.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers.Base;
 import dbdr.domain.guardian.dto.request.GuardianRequest;
 import dbdr.domain.guardian.dto.response.GuardianResponse;
+import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.guardian.service.GuardianService;
-import dbdr.security.LoginDbdrUser;
+import dbdr.security.LoginGuardian;
 import dbdr.security.dto.BaseUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,8 +27,8 @@ public class GuardianController {
 
     @GetMapping("/{guardianId}")
     public ResponseEntity<GuardianResponse> showGuardianInfo(
-        @PathVariable("guardianId") Long guardianId, @LoginDbdrUser BaseUserDetails baseUserDetails) {
-        log.info("guardianId: {}", baseUserDetails.getUserLoginId());
+        @PathVariable("guardianId") Long guardianId, @LoginGuardian Guardian gaurdian) {
+        log.info("guardianId: {}", gaurdian.getName());
         GuardianResponse guardianResponse = guardianService.getGuardianById(guardianId);
         return ResponseEntity.ok(guardianResponse);
     }
