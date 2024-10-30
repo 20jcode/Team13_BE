@@ -1,4 +1,4 @@
-package dbdr.security.service;
+package dbdr.security.model;
 
 import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.global.exception.ApplicationError;

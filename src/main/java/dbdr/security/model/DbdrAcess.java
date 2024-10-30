@@ -78,10 +78,11 @@ public class DbdrAcess {
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Chart chart) {
         if(userDetails.isInstitution()){
-            return userDetails.getInstitutionId().equals(chart.getInstitutionId());
+            //return userDetails.getInstitutionId().equals(chart.getInstitutionId());
+
         }
         if(userDetails.isCareworker()){
-            return userDetails.getId().equals(chart.getCareworker().getId());
+            //return userDetails.getId().equals(chart.getCareworker().getId());
         }
         return false;
     }

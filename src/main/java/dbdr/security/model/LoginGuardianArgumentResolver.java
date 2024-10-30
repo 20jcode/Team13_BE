@@ -1,14 +1,13 @@
-package dbdr.security.service;
+package dbdr.security.model;
 
-import dbdr.domain.careworker.repository.CareworkerRepository;
+import dbdr.domain.guardian.repository.GuardianRepository;
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
-import dbdr.security.LoginCareworker;
+import dbdr.security.LoginGuardian;
 import dbdr.security.dto.BaseUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -17,25 +16,23 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
 @RequiredArgsConstructor
-public class LoginCareworkerArgumentResolver implements HandlerMethodArgumentResolver {
+public class LoginGuardianArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final CareworkerRepository careworkerRepository;
+
+    private final GuardianRepository guardianRepository;
+
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(LoginCareworker.class) != null &&
-            UserDetails.class.isAssignableFrom(parameter.getParameterType());
+        return parameter.hasParameterAnnotation(LoginGuardian.class);
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-        NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-
+    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         BaseUserDetails baseUserDetails = (BaseUserDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        return careworkerRepository.findById(baseUserDetails.getId())
+        return guardianRepository.findById(baseUserDetails.getId())
             .orElseThrow(
                 () -> new ApplicationException(ApplicationError.USER_NOT_FOUND));
-
     }
 }
