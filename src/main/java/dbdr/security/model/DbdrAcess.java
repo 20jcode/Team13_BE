@@ -13,6 +13,11 @@ public class DbdrAcess {
 
     public boolean hasAccessPermission(Role role,BaseUserDetails userDetails, BaseEntity baseEntity) {
 
+        //admin
+        if(userDetails.isAdmin()){
+            return true;
+        }
+
         if(!hasRequiredRole(role, userDetails)){
             return false;
         }
@@ -36,9 +41,6 @@ public class DbdrAcess {
 
 
     private boolean hasRequiredRole(Role role, BaseUserDetails userDetails) {
-        if (role.equals(Role.ADMIN)){
-            return userDetails.isAdmin();
-        }
         if (role.equals(Role.INSTITUTION) && (userDetails.isAdmin() || userDetails.isInstitution())){
             return true;
         }

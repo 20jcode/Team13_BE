@@ -5,87 +5,65 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.chart.entity.Chart;
+import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class DbdrAcessTest {
     //인가과정을 담당하는 Model Test
 
-    //관리자 권한을 가진 사용자가 모든 권한을 가지고 있는지 확인
+    //관리자는 모든 유형에 대해 접근 권한을 가진다.
     @Test
-    void 관리자_이면_전부_ok() {
+    @DisplayName("관리자는 모든 유형 접근 가능")
+    void admin_has_access_permission() {
         //given
-        BaseUserDetails userDetails = BaseUserDetails.builder()
-            .id(1L)
-            .userLoginId("admin")
-            .password("admin")
-            .role("ADMIN")
-            .institutionId(1L)
-            .build();
-
         DbdrAcess dbdrAcess = new DbdrAcess();
 
-        Guardian guardian = new Guardian("123", "123");
-        Careworker careworker = new Careworker(1L, "123","ee","123");
-        Institution institution = new Institution(1L, "123");
+        //접근한 사용자는 관리자
+        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.ADMIN,0L,"password");
+
+        //접근 테스트 대상
+        Institution institution = Institution.builder().build();
+        Institution institution1 = Institution.builder().institutionName("test").institutionNumber(3L).build();
+        Careworker careworker = Careworker.builder().build();
+        Guardian guardian = Guardian.builder().build();
         //when
-        boolean resultGuardian = dbdrAcess.hasAccessPermission(userDetails, guardian);
-        boolean resultCareworker = dbdrAcess.hasAccessPermission(userDetails, careworker);
-        boolean resultInstitution = dbdrAcess.hasAccessPermission(userDetails, institution);
-        boolean resultChart  = dbdrAcess.hasAccessPermission(userDetails, new Chart());
+        boolean institutionResult = dbdrAcess.hasAccessPermission(Role.INSTITUTION, userDetails, institution);
+        boolean institutionResult1 = dbdrAcess.hasAccessPermission(Role.INSTITUTION, userDetails, institution1);
+        boolean careworkerResult = dbdrAcess.hasAccessPermission(Role.CAREWORKER, userDetails, careworker);
+        boolean guardianResult = dbdrAcess.hasAccessPermission(Role.GUARDIAN, userDetails, guardian);
 
         //then
-        assertThat(resultGuardian).isTrue();
-        assertThat(resultCareworker).isTrue();
-        assertThat(resultInstitution).isTrue();
-        assertThat(resultChart).isTrue();
-    }
-    @Test
-    void Careworker는_Guardian_접근불가(){
-        //given
-        BaseUserDetails userDetails = BaseUserDetails.builder()
-            .id(1L)
-            .userLoginId("careworker")
-            .password("careworker")
-            .role("CAREWORKER")
-            .institutionId(1L)
-            .build();
-
-        DbdrAcess dbdrAcess = new DbdrAcess();
-
-        Guardian guardian = new Guardian("123", "123");
-
-        //when
-        boolean resultGuardian = dbdrAcess.hasAccessPermission(userDetails, guardian);
-
-        //then
-        assertThat(resultGuardian).isFalse();
+        assertThat(institutionResult).isTrue();
+        assertThat(institutionResult1).isTrue();
+        assertThat(careworkerResult).isTrue();
+        assertThat(guardianResult).isTrue();
     }
 
     @Test
-    void Careworker는_접근자가_요양원ID같아야_접근가능(){
+    @DisplayName("요양원은 자신의 소속 요양보호사만 접근할 수 있다.")
+    void institution_has_access_permission() {
         //given
-        BaseUserDetails userDetails = BaseUserDetails.builder()
-            .id(1L)
-            .userLoginId("careworker")
-            .password("careworker")
-            .role("CAREWORKER")
-            .institutionId(1L)
-            .build();
-
         DbdrAcess dbdrAcess = new DbdrAcess();
 
-        Careworker careworker = new Careworker(1L, "123","ee","123");
-        Careworker careworker2 = new Careworker(2L, "123","ee","123");
+        //접근한 사용자는 요양원
+        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.INSTITUTION,1L,"password");
+
+        //접근 테스트 대상
+        Careworker careworker = Careworker.builder().institutionId(1L).build(); //같은 요양원 소속 요양보호사
+        Careworker careworker2 = Careworker.builder().institutionId(2L).build(); //타 기관 소속 요양보호사
 
         //when
-        boolean resultCareworker = dbdrAcess.hasAccessPermission(userDetails, careworker);
-        boolean resultCareworker2 = dbdrAcess.hasAccessPermission(userDetails, careworker2);
+        boolean careworkerResult = dbdrAcess.hasAccessPermission(Role.INSTITUTION, userDetails, careworker);
+        boolean careworkerResult2 = dbdrAcess.hasAccessPermission(Role.INSTITUTION, userDetails, careworker2);
 
         //then
-        assertThat(resultCareworker).isTrue();
-        assertThat(resultCareworker2).isFalse();
+        assertThat(careworkerResult).isTrue();
+        assertThat(careworkerResult2).isFalse();
     }
+
+
 
 }
