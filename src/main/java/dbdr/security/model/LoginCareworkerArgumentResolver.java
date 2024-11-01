@@ -4,7 +4,6 @@ import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
 import dbdr.security.LoginCareworker;
-import dbdr.security.dto.BaseUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;

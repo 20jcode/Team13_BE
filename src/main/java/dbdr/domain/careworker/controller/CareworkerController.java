@@ -3,6 +3,9 @@ package dbdr.domain.careworker.controller;
 import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
 import dbdr.domain.careworker.dto.response.CareworkerResponseDTO;
 import dbdr.domain.careworker.service.CareworkerService;
+import dbdr.security.model.AuthParam;
+import dbdr.security.model.DbdrAuth;
+import dbdr.security.model.Role;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -29,6 +32,7 @@ public class CareworkerController {
     @Value("${spring.app.version}")
     private String appVersion;
 
+
     @GetMapping
     public ResponseEntity<List<CareworkerResponseDTO>> getAllCareworkers(
             @RequestParam(value = "institutionId", required = false) Long institutionId) {
@@ -41,6 +45,7 @@ public class CareworkerController {
         return ResponseEntity.ok(careworkerList);
     }
 
+    @DbdrAuth(targetRole = Role.CAREWORKER,type= AuthParam.CAREWORKER_ID,id="id" )
     @GetMapping("/{id}")
     public ResponseEntity<CareworkerResponseDTO> getCareworkerById(
             @PathVariable Long id) {

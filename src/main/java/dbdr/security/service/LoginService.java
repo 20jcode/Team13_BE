@@ -33,7 +33,7 @@ public class LoginService {
         BaseUserDetails userDetails = BaseUserDetails.builder()
             .userLoginId(loginRequest.userId())
             .password(loginRequest.password())
-            .role(role.name())
+            .role(role)
             .build();
         log.debug("로그인 서비스 접근 시작");
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, loginRequest.password());

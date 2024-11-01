@@ -98,7 +98,7 @@ class JwtProviderTest {
             Role role1 = invocation.getArgument(1);
             return BaseUserDetails.builder()
                 .userLoginId(username1)
-                .role(role1.name())
+                .role(role1)
                 .password("test")
                 .institutionId(1L)
                 .build();
