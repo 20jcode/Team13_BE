@@ -1,5 +1,9 @@
 package dbdr.domain.guardian.entity;
 
+import dbdr.domain.recipient.entity.Recipient;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalTime;
 
 import org.hibernate.annotations.SQLDelete;
@@ -39,6 +43,10 @@ public class Guardian extends BaseEntity {
 
     @Column(nullable = true)
     private LocalTime alertTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id")
+    private Recipient recipient;
 
     @Builder
     public Guardian(String phone, String name) {
