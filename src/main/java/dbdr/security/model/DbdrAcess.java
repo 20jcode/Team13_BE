@@ -59,7 +59,7 @@ public class DbdrAcess {
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Careworker careworker) {
         if (userDetails.isInstitution()) {
-            return userDetails.getInstitutionId().equals(careworker.getInstitutionId());
+            return userDetails.getInstitutionId().equals(careworker.getInstitution().getId());
         }
         if (userDetails.isCareworker()) {
             return userDetails.getId().equals(careworker.getId());
@@ -70,7 +70,7 @@ public class DbdrAcess {
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Guardian guardian) {
         if (userDetails.isInstitution()) {
-            return userDetails.getInstitutionId().equals(guardian.getInstitutionId());
+            return userDetails.getInstitutionId().equals(guardian.getRecipient().getInstitutionNumber());
         }
         if(userDetails.isGuardian()){
             return userDetails.getId().equals(guardian.getId());
@@ -80,17 +80,19 @@ public class DbdrAcess {
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Chart chart) {
         if(userDetails.isInstitution()){
-            //return userDetails.getInstitutionId().equals(chart.getInstitutionId());
+            return userDetails.getInstitutionId().equals(chart.getRecipient().getInstitutionNumber());
 
         }
         if(userDetails.isCareworker()){
-            //return userDetails.getId().equals(chart.getCareworker().getId());
+            return userDetails.getId().equals(chart.getRecipient().getCareworker().getId());
+        }
+        if(userDetails.isGuardian()){
+            return userDetails.getId().equals(chart.getRecipient().getGuardian().getId());
         }
         return false;
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Recipient recipient) {
-        //TODO : chart와 recipient사이 관계가 있으므로 리팩토링 가능
         if(userDetails.isAdmin()){
             return userDetails.getInstitutionId().equals(recipient.getInstitutionNumber());
         }

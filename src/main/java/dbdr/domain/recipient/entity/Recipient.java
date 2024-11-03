@@ -2,9 +2,11 @@ package dbdr.domain.recipient.entity;
 
 import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.careworker.entity.Careworker;
+import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
 import jakarta.persistence.*;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,6 +52,10 @@ public class Recipient extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "careworker_id")
     private Careworker careworker;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "guardian_id")
+    private Guardian guardian;
 
     @Builder
     public Recipient(String name,

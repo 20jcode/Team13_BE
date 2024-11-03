@@ -8,9 +8,9 @@ import static dbdr.global.util.api.JwtUtils.TOKEN_PREFIX;
 
 import dbdr.global.exception.ApplicationException;
 import dbdr.global.util.api.JwtUtils;
-import dbdr.security.Role;
-import dbdr.security.dto.BaseUserDetails;
 import dbdr.security.dto.TokenDTO;
+import dbdr.security.model.BaseUserDetails;
+import dbdr.security.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;

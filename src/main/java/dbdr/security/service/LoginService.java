@@ -1,9 +1,11 @@
 package dbdr.security.service;
 
-import dbdr.security.Role;
-import dbdr.security.dto.BaseUserDetails;
+
 import dbdr.security.dto.LoginRequest;
 import dbdr.security.dto.TokenDTO;
+import dbdr.security.model.BaseUserDetails;
+import dbdr.security.model.Role;
+import dbdr.security.service.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -17,7 +19,7 @@ public class LoginService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    private final JwtProvider jwtProvider;
+    private final dbdr.security.service.JwtProvider jwtProvider;
 
     public LoginService(AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
@@ -29,7 +31,7 @@ public class LoginService {
         BaseUserDetails userDetails = BaseUserDetails.builder()
                 .userLoginId(loginRequest.userId())
                 .password(loginRequest.password())
-                .role(role.name())
+                .role(role)
                 .build();
         log.debug("로그인 서비스 접근 시작");
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
