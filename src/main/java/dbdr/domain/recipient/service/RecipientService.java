@@ -1,6 +1,8 @@
 package dbdr.domain.recipient.service;
 
 import dbdr.domain.careworker.repository.CareworkerRepository;
+import dbdr.domain.institution.entity.Institution;
+import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
 import dbdr.domain.recipient.dto.response.RecipientResponseDTO;
 import dbdr.domain.recipient.entity.Recipient;
@@ -19,6 +21,7 @@ public class RecipientService {
 
     private final RecipientRepository recipientRepository;
     private final CareworkerRepository careworkerRepository;
+    private final InstitutionRepository institutionRepository;
 
     @Transactional(readOnly = true)
     public List<RecipientResponseDTO> getAllRecipients() {
@@ -36,6 +39,8 @@ public class RecipientService {
     @Transactional
     public RecipientResponseDTO createRecipient(RecipientRequestDTO recipientRequestDTO) {
         ensureUniqueCareNumber(recipientRequestDTO.getCareNumber());
+        Institution institution = institutionRepository.findById(recipientRequestDTO.getInstitutionId())
+                .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
         Recipient recipient = new Recipient(
                 recipientRequestDTO.getName(),
                 recipientRequestDTO.getBirth(),
@@ -43,7 +48,7 @@ public class RecipientService {
                 recipientRequestDTO.getCareLevel(),
                 recipientRequestDTO.getCareNumber(),
                 recipientRequestDTO.getStartDate(),
-                recipientRequestDTO.getInstitution(),
+                institution,
                 recipientRequestDTO.getInstitutionNumber(),
                 careworkerRepository.findById(recipientRequestDTO.getCareworkerId())
                         .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND))
@@ -91,9 +96,10 @@ public class RecipientService {
                 recipient.getCareLevel(),
                 recipient.getCareNumber(),
                 recipient.getStartDate(),
-                recipient.getInstitution(),
+                recipient.getInstitution().getInstitutionName(),
                 recipient.getInstitutionNumber(),
-                recipient.getCareworker() != null ? recipient.getCareworker().getId() : null
+                recipient.getInstitution().getId(),
+                recipient.getCareworker().getId()
         );
     }
 }

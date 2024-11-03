@@ -60,7 +60,7 @@ public class RecipientController {
             @RequestParam(required = false) Long careworkerId,
             @Valid @RequestBody RecipientRequestDTO recipientDTO) {
 
-        RecipientResponseDTO updatedRecipient = recipientService.updateRecipient(recipientId, recipientDTO,institutionId, careworkerId);
+        RecipientResponseDTO updatedRecipient = null;//recipientService.updateRecipient(recipientId, recipientDTO,institutionId, careworkerId);
         return ResponseEntity.ok(updatedRecipient);
     }
 
@@ -71,7 +71,8 @@ public class RecipientController {
             @RequestParam(required = false) Long institutionId,
             @RequestParam(required = false) Long careworkerId) {
 
-        recipientService.deleteRecipient(recipientId, institutionId, careworkerId);
+        //
+        // recipientService.deleteRecipient(recipientId, institutionId, careworkerId);
         return ResponseEntity.noContent().build();
     }
 }
