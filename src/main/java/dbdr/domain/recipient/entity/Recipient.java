@@ -4,9 +4,8 @@ import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
-import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
+import dbdr.domain.recipient.dto.request.RecipientRequest;
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -79,7 +78,7 @@ public class Recipient extends BaseEntity {
     }
 
 
-    public void updateRecipient(RecipientRequestDTO recipientDTO) {
+    public void updateRecipient(RecipientRequest recipientDTO) {
         this.name = recipientDTO.getName();
         this.birth = recipientDTO.getBirth();
         this.gender = recipientDTO.getGender();

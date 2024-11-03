@@ -1,7 +1,5 @@
 package dbdr.domain.recipient.dto.request;
 
-import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.institution.entity.Institution;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +13,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipientRequestDTO {
+public class RecipientRequest {
 
     @Schema(description = "돌봄대상자 이름", example = "이순자")
     @NotBlank(message = "이름은 필수 항목입니다.")

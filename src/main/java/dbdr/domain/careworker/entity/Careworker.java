@@ -1,11 +1,9 @@
 package dbdr.domain.careworker.entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import dbdr.domain.core.base.entity.BaseEntity;
-import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
+import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.institution.entity.Institution;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
@@ -58,7 +56,7 @@ public class Careworker extends BaseEntity {
         this.alertTime = LocalTime.of(17, 0); // 오후 5시로 초기화
     }
 
-    public void updateCareworker(CareworkerRequestDTO careworkerDTO) {
+    public void updateCareworker(CareworkerRequest careworkerDTO) {
         //this.institutionId = careworkerDTO.getInstitutionId();
         this.name = careworkerDTO.getName();
         this.email = careworkerDTO.getEmail();

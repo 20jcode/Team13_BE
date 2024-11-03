@@ -1,6 +1,6 @@
 package dbdr.domain.recipient.controller;
 
-import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
+import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.dto.response.RecipientResponseDTO;
 import dbdr.domain.recipient.service.RecipientService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class RecipientController {
     @Operation(summary = "돌봄대상자 추가", security = @SecurityRequirement(name = "JWT"))
     @PostMapping
     public ResponseEntity<RecipientResponseDTO> createRecipient(
-            @Valid @RequestBody RecipientRequestDTO recipientDTO) {
+            @Valid @RequestBody RecipientRequest recipientDTO) {
         RecipientResponseDTO newRecipient = recipientService.createRecipient(recipientDTO);
         return ResponseEntity.created(
                         URI.create("/" + appVersion + "/recipient/" + newRecipient.getId()))
@@ -58,7 +58,7 @@ public class RecipientController {
             @PathVariable("recipientId") Long recipientId,
             @RequestParam(required = false) Long institutionId,
             @RequestParam(required = false) Long careworkerId,
-            @Valid @RequestBody RecipientRequestDTO recipientDTO) {
+            @Valid @RequestBody RecipientRequest recipientDTO) {
 
         RecipientResponseDTO updatedRecipient = null;//recipientService.updateRecipient(recipientId, recipientDTO,institutionId, careworkerId);
         return ResponseEntity.ok(updatedRecipient);

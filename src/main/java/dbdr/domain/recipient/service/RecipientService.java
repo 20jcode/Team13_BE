@@ -3,7 +3,7 @@ package dbdr.domain.recipient.service;
 import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.institution.repository.InstitutionRepository;
-import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
+import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.dto.response.RecipientResponseDTO;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
@@ -37,20 +37,20 @@ public class RecipientService {
     }
 
     @Transactional
-    public RecipientResponseDTO createRecipient(RecipientRequestDTO recipientRequestDTO) {
-        ensureUniqueCareNumber(recipientRequestDTO.getCareNumber());
-        Institution institution = institutionRepository.findById(recipientRequestDTO.getInstitutionId())
+    public RecipientResponseDTO createRecipient(RecipientRequest recipientRequest) {
+        ensureUniqueCareNumber(recipientRequest.getCareNumber());
+        Institution institution = institutionRepository.findById(recipientRequest.getInstitutionId())
                 .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
         Recipient recipient = new Recipient(
-                recipientRequestDTO.getName(),
-                recipientRequestDTO.getBirth(),
-                recipientRequestDTO.getGender(),
-                recipientRequestDTO.getCareLevel(),
-                recipientRequestDTO.getCareNumber(),
-                recipientRequestDTO.getStartDate(),
+                recipientRequest.getName(),
+                recipientRequest.getBirth(),
+                recipientRequest.getGender(),
+                recipientRequest.getCareLevel(),
+                recipientRequest.getCareNumber(),
+                recipientRequest.getStartDate(),
                 institution,
-                recipientRequestDTO.getInstitutionNumber(),
-                careworkerRepository.findById(recipientRequestDTO.getCareworkerId())
+                recipientRequest.getInstitutionNumber(),
+                careworkerRepository.findById(recipientRequest.getCareworkerId())
                         .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND))
         );
         recipientRepository.save(recipient);
@@ -58,12 +58,12 @@ public class RecipientService {
     }
 
     @Transactional
-    public RecipientResponseDTO updateRecipient(Long id, RecipientRequestDTO recipientRequestDTO) {
-        ensureUniqueCareNumber(recipientRequestDTO.getCareNumber());
+    public RecipientResponseDTO updateRecipient(Long id, RecipientRequest recipientRequest) {
+        ensureUniqueCareNumber(recipientRequest.getCareNumber());
 
         Recipient recipient = findRecipientById(id);
 
-        recipient.updateRecipient(recipientRequestDTO);
+        recipient.updateRecipient(recipientRequest);
         recipientRepository.save(recipient);
 
         return toResponseDTO(recipient);

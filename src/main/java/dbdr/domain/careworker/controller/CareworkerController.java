@@ -1,12 +1,9 @@
 package dbdr.domain.careworker.controller;
 
-import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
+import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.careworker.dto.response.CareworkerResponseDTO;
-import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.careworker.service.CareworkerService;
-import dbdr.security.LoginCareworker;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,7 +43,7 @@ public class CareworkerController {
     @PostMapping("/{institutionId}")
     public ResponseEntity<CareworkerResponseDTO> createCareworker(
             @PathVariable Long institutionId,
-            @Valid @RequestBody CareworkerRequestDTO careworkerDTO) {
+            @Valid @RequestBody CareworkerRequest careworkerDTO) {
         CareworkerResponseDTO newCareworker = careworkerService.createCareworker(careworkerDTO, institutionId);
         return ResponseEntity.created(
                         URI.create("/" + institutionId + "/careworker/" + newCareworker.getId()))
@@ -58,7 +55,7 @@ public class CareworkerController {
     public ResponseEntity<CareworkerResponseDTO> updateCareworker(
             @PathVariable Long careworkerId,
             @RequestParam("institutionId") @NotNull Long institutionId,
-            @RequestBody CareworkerRequestDTO careworkerDTO) {
+            @RequestBody CareworkerRequest careworkerDTO) {
         CareworkerResponseDTO updatedCareworker = careworkerService.updateCareworker(careworkerId, careworkerDTO, institutionId);
         return ResponseEntity.ok(updatedCareworker);
     }
