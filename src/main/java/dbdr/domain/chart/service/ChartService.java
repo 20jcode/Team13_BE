@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ChartService {
+
     private final ChartRepository chartRepository;
     private final ChartMapper chartMapper;
 
@@ -42,5 +43,4 @@ public class ChartService {
         Chart savedChart = chartRepository.save(chart);
         return chartMapper.toResponse(savedChart);
     }
-
 }

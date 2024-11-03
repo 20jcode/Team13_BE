@@ -1,15 +1,14 @@
-package dbdr.security.model;
+package dbdr.security.service;
 
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
-import dbdr.security.service.BaseUserDetailsService;
+import dbdr.security.dto.BaseUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
@@ -26,14 +25,13 @@ public class BaseAuthenticationProvider implements AuthenticationProvider {
         BaseUserDetails unAuthUser = (BaseUserDetails) authentication.getPrincipal();
         BaseUserDetails authUser = baseUserDetailsService.loadUserByUsernameAndRole(unAuthUser.getUserLoginId(), unAuthUser.getRole());
 
-        checkPassword(unAuthUser, authUser);
-        return new UsernamePasswordAuthenticationToken(authUser, authUser.getPassword(), authUser.getAuthorities());
-    }
-
-    private void checkPassword(BaseUserDetails unAuthUser, BaseUserDetails authUser) {
+        log.debug("unAuthUser : 검사시작 {}", unAuthUser.getUserLoginId());
+        //비밀번호 일치 확인
         if (!passwordEncoder.matches(unAuthUser.getPassword(), authUser.getPassword())) {
             throw new ApplicationException(ApplicationError.PASSWORD_NOT_MATCH);
         }
+
+        return new UsernamePasswordAuthenticationToken(authUser, authUser.getPassword(), authUser.getAuthorities());
     }
 
     @Override

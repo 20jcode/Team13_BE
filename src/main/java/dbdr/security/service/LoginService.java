@@ -1,11 +1,10 @@
 package dbdr.security.service;
 
-import dbdr.security.model.JwtProvider;
-import dbdr.security.model.Role;
-import dbdr.security.model.BaseUserDetails;
+import dbdr.security.Role;
+import dbdr.security.dto.BaseUserDetails;
 import dbdr.security.dto.LoginRequest;
+import dbdr.security.dto.TokenDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -20,26 +19,32 @@ public class LoginService {
 
     private final JwtProvider jwtProvider;
 
-    private final Long jwtExpiration;
-
-    public LoginService(AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider, @Value("${spring.jwt.jwtexpiration}") Long jwtExpiration) {
+    public LoginService(AuthenticationManagerBuilder authenticationManagerBuilder, JwtProvider jwtProvider) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtProvider = jwtProvider;
-        this.jwtExpiration = jwtExpiration;
     }
 
     @Transactional
-    public String login(Role role, LoginRequest loginRequest) {
+    public TokenDTO login(Role role, LoginRequest loginRequest) {
         BaseUserDetails userDetails = BaseUserDetails.builder()
-            .userLoginId(loginRequest.userId())
-            .password(loginRequest.password())
-            .role(role)
-            .build();
+                .userLoginId(loginRequest.userId())
+                .password(loginRequest.password())
+                .role(role.name())
+                .build();
         log.debug("로그인 서비스 접근 시작");
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, loginRequest.password());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
+                loginRequest.password());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        return jwtProvider.createAccessToken(authentication.getName(), role.name(), jwtExpiration);
+        return jwtProvider.createAllToken(authentication.getName(), role.name());
+    }
+
+    public TokenDTO renewAccessToken(String refreshToken) {
+        return jwtProvider.renewTokens(refreshToken);
+    }
+
+    public void logout(String accessToken) {
+        jwtProvider.deleteRefreshToken(accessToken);
     }
 
 }

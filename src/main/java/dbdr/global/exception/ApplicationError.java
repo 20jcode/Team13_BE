@@ -14,6 +14,7 @@ public enum ApplicationError {
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),
     PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     ILLIGAL_ARGUMENT(HttpStatus.INTERNAL_SERVER_ERROR, "인증 과정 중 문제가 생겼습니다."),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다. 재로그인 해주세요."),
 
     // Guardian (보호자)
     GUARDIAN_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 보호자를 찾을 수가 없습니다."),
@@ -40,6 +41,12 @@ public enum ApplicationError {
 
     // 시스템
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "데이터베이스 처리 중 오류가 발생했습니다."),
+
+    //JSON
+    JSON_PARSING_ERROR(HttpStatus.BAD_REQUEST, "잘못된 json형식입니다."),
+
+    //Date
+    CANNOT_DETECT_DATE(HttpStatus.BAD_REQUEST, "알 수 없는 날짜입니다."),
 
     // Line Message API
     CANNOT_FIND_EVENT(HttpStatus.NOT_FOUND, "해당 이벤트를 찾을 수가 없습니다."),
