@@ -17,45 +17,40 @@ public class InstitutionService {
 
     private final InstitutionRepository institutionRepository;
 
-    public Institution getInstitutionById(Long id) {
-        return institutionRepository.findById(id)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
-    }
-
-    public InstitutionResponse getInstitutionResponseById(Long id) {
-        Institution institution = getInstitutionById(id);
+    public InstitutionResponse getInstitutionById(Long institutionId) {
+        Institution institution = getInstitution(institutionId);
         return new InstitutionResponse(institution.getInstitutionNumber(),
-                institution.getInstitutionName());
+            institution.getInstitutionName());
     }
 
-    public InstitutionResponse updateInstitution(Long id, InstitutionRequest institutionRequest) {
+    public InstitutionResponse updateInstitution(Long institutionId, InstitutionRequest institutionRequest) {
         ensureUniqueInstitutionNumber(institutionRequest.institutionNumber());
 
-        Institution institution = getInstitution(id);
+        Institution institution = getInstitution(institutionId);
         institution.updateInstitution(institutionRequest.institutionNumber(), institutionRequest.institutionName());
         institutionRepository.save(institution);
         return new InstitutionResponse(institutionRequest.institutionNumber(),
-                institutionRequest.institutionName());
+            institutionRequest.institutionName());
     }
 
     public List<InstitutionResponse> getAllInstitution() {
         List<Institution> institutionList = institutionRepository.findAll();
         return institutionList.stream().map(
-                institution -> new InstitutionResponse(institution.getInstitutionNumber(),
-                        institution.getInstitutionName())).toList();
+            institution -> new InstitutionResponse(institution.getInstitutionNumber(),
+                institution.getInstitutionName())).toList();
     }
 
     public InstitutionResponse addInstitution(InstitutionRequest institutionRequest) {
         ensureUniqueInstitutionNumber(institutionRequest.institutionNumber());
         Institution institution = new Institution(institutionRequest.institutionNumber(),
-                institutionRequest.institutionName());
+            institutionRequest.institutionName());
         institution = institutionRepository.save(institution);
         return new InstitutionResponse(institution.getInstitutionNumber(),
-                institution.getInstitutionName());
+            institution.getInstitutionName());
     }
 
-    public void deleteInstitutionById(Long id) {
-        Institution institution = getInstitution(id);
+    public void deleteInstitutionById(Long institutionId) {
+        Institution institution = getInstitution(institutionId);
         institution.deactivate();
         institutionRepository.delete(institution);
     }
@@ -66,8 +61,8 @@ public class InstitutionService {
         }
     }
 
-    private Institution getInstitution(Long id) {
-        return institutionRepository.findById(id)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
+    private Institution getInstitution(Long institutionId) {
+        return institutionRepository.findById(institutionId)
+            .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
     }
 }

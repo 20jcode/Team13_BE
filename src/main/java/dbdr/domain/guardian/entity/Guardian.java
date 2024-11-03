@@ -1,5 +1,9 @@
 package dbdr.domain.guardian.entity;
 
+import dbdr.domain.recipient.entity.Recipient;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalTime;
 
 import org.hibernate.annotations.SQLDelete;
@@ -40,8 +44,9 @@ public class Guardian extends BaseEntity {
     @Column(nullable = true)
     private LocalTime alertTime;
 
-    @Column(nullable = false) //TODO : 한 보호자가 여러기관에 id를 가지고 있다면?
-    private Long institutionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id")
+    private Recipient recipient;
 
     @Builder
     public Guardian(String phone, String name) {
