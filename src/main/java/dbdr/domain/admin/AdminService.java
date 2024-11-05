@@ -13,7 +13,7 @@ public class AdminService {
     private final AdminRepository adminRepository;
 
     @Transactional
-    public Admin createAdmin(Admin admin) {
+    public Admin addAdmin(Admin admin) {
         return adminRepository.save(admin);
     }
 
