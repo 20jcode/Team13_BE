@@ -100,9 +100,7 @@ public class DbdrAcess {
             return userDetails.getId().equals(recipient.getCareworker().getId());
         }
         if(userDetails.isGuardian()){
-            return false;
-            //TODO : 환자와 보호자 간의 mapping 필요
-            //return userDetails.getId().equals(recipient.getGuardian().getId());
+            return userDetails.getId().equals(recipient.getGuardian().getId());
         }
         return false;
     }

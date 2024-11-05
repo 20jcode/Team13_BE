@@ -44,7 +44,7 @@ public class CareworkerController {
     public ResponseEntity<CareworkerResponseDTO> createCareworker(
             @PathVariable Long institutionId,
             @Valid @RequestBody CareworkerRequest careworkerDTO) {
-        CareworkerResponseDTO newCareworker = careworkerService.createCareworker(careworkerDTO, institutionId);
+        CareworkerResponseDTO newCareworker = careworkerService.addCareworker(careworkerDTO);
         return ResponseEntity.created(
                         URI.create("/" + institutionId + "/careworker/" + newCareworker.getId()))
                 .body(newCareworker);

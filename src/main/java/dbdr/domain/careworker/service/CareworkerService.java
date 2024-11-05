@@ -43,10 +43,10 @@ public class CareworkerService {
     }
 
     @Transactional
-    public CareworkerResponseDTO createCareworker(CareworkerRequest careworkerRequest, Long institutionId) {
+    public CareworkerResponseDTO addCareworker(CareworkerRequest careworkerRequest) {
         ensureUniqueEmail(careworkerRequest.getEmail());
         ensureUniquePhone(careworkerRequest.getPhone());
-
+        Long institutionId = careworkerRequest.getInstitutionId();
         Institution institution = institutionRepository.findById(institutionId)
             .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
         Careworker careworker = new Careworker(institution, careworkerRequest.getName(),
