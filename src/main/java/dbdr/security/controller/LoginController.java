@@ -9,6 +9,7 @@ import dbdr.security.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "로그인", description = "로그인하기")
 @RestController
 @RequestMapping("/${spring.app.version}/auth")
+@Slf4j
 public class LoginController {
 
     private final LoginService loginService;
@@ -36,6 +38,7 @@ public class LoginController {
     @PostMapping("/login/{role}")
     public ResponseEntity<TokenDTO> login(@PathVariable("role") String role,
                                           @RequestBody @Valid LoginRequest loginRequest) {
+        log.debug("로그인 요청 받음 : 역할 = {}, id : {}, password : {}", role,loginRequest.userId(), loginRequest.password());
         Role roleEnum = roleCheck(role);
         TokenDTO token = loginService.login(roleEnum, loginRequest);
         return ResponseEntity.ok().header(authHeader, token.accessToken()).body(token);

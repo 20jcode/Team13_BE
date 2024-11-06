@@ -1,5 +1,7 @@
 package dbdr.security.service;
 
+import dbdr.domain.admin.entity.Admin;
+import dbdr.domain.admin.repository.AdminRepository;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.domain.guardian.entity.Guardian;
@@ -25,6 +27,7 @@ public class BaseUserDetailsService {
     private final GuardianRepository guardianRepository;
     private final CareworkerRepository careWorkerRepository;
     private final InstitutionRepository institutionRepository;
+    private final AdminRepository adminRepository;
 
     public BaseUserDetails loadUserByUsernameAndRole(String username, Role role) {
 
@@ -58,9 +61,9 @@ public class BaseUserDetailsService {
     }
 
     private BaseUserDetails getAdminDetails(String username) {
-        //TODO : admin 필요
-
-        return null;
+        Admin admin = adminRepository.findByLoginId(username)
+            .orElseThrow(() -> new ApplicationException(ApplicationError.ADMIN_NOT_FOUND));
+        return securityRegister(admin.getId(), admin.getLoginId(), admin.getLoginPassword(), Role.ADMIN);
     }
 
     private BaseUserDetails getGuadianDetails(String userId) {
@@ -78,6 +81,7 @@ public class BaseUserDetailsService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
             userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.debug("security register : {}", userDetails.getUserLoginId());
         return userDetails;
     }
 

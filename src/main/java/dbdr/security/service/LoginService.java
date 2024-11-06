@@ -28,12 +28,14 @@ public class LoginService {
 
     @Transactional
     public TokenDTO login(Role role, LoginRequest loginRequest) {
+        log.debug("로그인 서비스 Null check, role: {}, loginRequest: {}", role, loginRequest);
+        log.debug("로그인 서비스 id : {}, password : {}", loginRequest.userId(), loginRequest.password());
         BaseUserDetails userDetails = BaseUserDetails.builder()
                 .userLoginId(loginRequest.userId())
                 .password(loginRequest.password())
                 .role(role)
                 .build();
-        log.debug("로그인 서비스 접근 시작");
+        log.debug("로그인 서비스 접근 시작, 아이디 : {}, 비밀번호 : {}", loginRequest.userId(), loginRequest.password());
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails,
                 loginRequest.password());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);

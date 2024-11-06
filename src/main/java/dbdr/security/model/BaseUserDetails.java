@@ -15,13 +15,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class BaseUserDetails implements UserDetails {
 
-    @NonNull
     private final Long id;
     @NonNull
     private final String userLoginId;
     @NonNull
     private final Role role;
-    @NonNull
     private final Long institutionId;
 
     private final String password;

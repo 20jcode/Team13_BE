@@ -6,13 +6,15 @@ import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.recipient.entity.Recipient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class DbdrAcess {
 
     public boolean hasAccessPermission(Role role,BaseUserDetails userDetails, BaseEntity baseEntity) {
-
+        log.info("권한확인 메소드 동작 시작 : role : {}, userDetails : {}, baseEntity : {}", role, userDetails, baseEntity);
         //admin
         if(userDetails.isAdmin()){
             return true;
