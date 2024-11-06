@@ -2,8 +2,10 @@ package dbdr.testhelper;
 
 import com.linecorp.bot.client.LineMessagingClient;
 import dbdr.domain.admin.entity.Admin;
+import dbdr.domain.admin.repository.AdminRepository;
 import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.careworker.entity.Careworker;
+import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.domain.careworker.service.CareworkerService;
 import dbdr.domain.chart.dto.ChartMapper;
 import dbdr.domain.chart.entity.Chart;
@@ -11,12 +13,15 @@ import dbdr.domain.chart.repository.ChartRepository;
 import dbdr.domain.chart.service.ChartService;
 import dbdr.domain.guardian.dto.request.GuardianRequest;
 import dbdr.domain.guardian.entity.Guardian;
+import dbdr.domain.guardian.repository.GuardianRepository;
 import dbdr.domain.guardian.service.GuardianService;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.entity.Institution;
+import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.domain.institution.service.InstitutionService;
 import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.entity.Recipient;
+import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,13 +55,28 @@ public class TestHelperFactory {
     ChartService chartService;
 
     @Autowired
-    ChartRepository chartRepository;
-
-    @Autowired
     RecipientService recipientService;
 
     @Autowired
     AdminService adminService;
+
+    @Autowired
+    GuardianRepository guardianRepository;
+
+    @Autowired
+    CareworkerRepository careworkerRepository;
+
+    @Autowired
+    InstitutionRepository institutionRepository;
+
+    @Autowired
+    ChartRepository chartRepository;
+
+    @Autowired
+    RecipientRepository recipientRepository;
+
+    @Autowired
+    AdminRepository adminRepository;
 
     @Autowired
     ChartMapper chartMapper;
@@ -77,6 +97,22 @@ public class TestHelperFactory {
             .build();
         testHelper = new TestHelper(port, restClient);
         return testHelper;
+    }
+
+    public void clear() {
+        guardians.clear();
+        careworkers.clear();
+        institutions.clear();
+        recipients.clear();
+        charts.clear();
+        admins.clear();
+
+        guardianRepository.deleteAll();
+        careworkerRepository.deleteAll();
+        institutionRepository.deleteAll();
+        chartRepository.deleteAll();
+        recipientRepository.deleteAll();
+        adminRepository.deleteAll();
     }
 
     private void serviceInit() {
