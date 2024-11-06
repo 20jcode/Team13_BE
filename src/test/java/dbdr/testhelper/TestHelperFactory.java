@@ -23,9 +23,12 @@ import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -81,6 +84,9 @@ public class TestHelperFactory {
     @Autowired
     ChartMapper chartMapper;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private TestHelper testHelper;
 
     private List<GuardianRequest> guardians = new ArrayList<>();
@@ -92,6 +98,7 @@ public class TestHelperFactory {
 
     public TestHelper create(Integer port) {
         serviceInit();
+        tableCreate();
         RestClient restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/v1")
             .defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
             .build();
@@ -99,20 +106,7 @@ public class TestHelperFactory {
         return testHelper;
     }
 
-    public void clear() {
-        guardians.clear();
-        careworkers.clear();
-        institutions.clear();
-        recipients.clear();
-        charts.clear();
-        admins.clear();
-
-        guardianRepository.deleteAll();
-        careworkerRepository.deleteAll();
-        institutionRepository.deleteAll();
-        chartRepository.deleteAll();
-        recipientRepository.deleteAll();
-        adminRepository.deleteAll();
+    private void tableCreate() {
     }
 
     private void serviceInit() {
