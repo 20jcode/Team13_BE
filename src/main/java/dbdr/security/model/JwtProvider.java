@@ -18,13 +18,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Component
+@Slf4j
 public class JwtProvider {
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 
@@ -40,10 +43,15 @@ public class JwtProvider {
     }
 
     public String extractToken(HttpServletRequest request) {
+        log.info("request 토큰 추출 시작");
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
+            log.info("제거 전 request 토큰 값 : {}", bearerToken);
+            bearerToken = bearerToken.substring(TOKEN_PREFIX.length());
+            log.info("request 토큰 값 : {}", bearerToken);
             return bearerToken;
         }
+        log.info("request 토큰 추출 실패");
         return null;
     }
 
@@ -85,23 +93,33 @@ public class JwtProvider {
     }
 
     private void validateBlackListToken(String token) {
+        //TODO : test환경에서 redis 잠시 끄기
+        /*
         if (redisService.isBlackList(getRedisCode(token), token)) {
             throw new ApplicationException(TOKEN_EXPIRED);
         }
+
+         */
     }
 
     public TokenDTO renewTokens(String refreshToken) {
+        /*
         if (!isValidRedisRefreshToken(getRedisCode(refreshToken), refreshToken)) {
             redisService.deleteRefreshToken(getRedisCode(refreshToken));
             throw new ApplicationException(REFRESH_TOKEN_EXPIRED);
         }
+
+         */
         return createAllToken(getUserName(refreshToken), getRole(refreshToken));
     }
 
     public void deleteRefreshToken(String accessToken) {
+        /*
         String redisCode = getRedisCode(accessToken);
         redisService.deleteRefreshToken(redisCode);
         redisService.saveBlackList(redisCode, accessToken);
+
+         */
     }
 
     private Boolean isValidRedisRefreshToken(String code, String refreshToken) {
