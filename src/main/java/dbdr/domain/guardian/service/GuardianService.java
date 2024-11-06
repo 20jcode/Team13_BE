@@ -43,7 +43,12 @@ public class GuardianService {
 
     public GuardianResponse addGuardian(GuardianRequest guardianRequest) {
         ensureUniquePhone(guardianRequest.phone());
-        Guardian guardian = new Guardian(guardianRequest.phone(), guardianRequest.name());
+        Guardian guardian = Guardian.builder().phone(guardianRequest.phone())
+            .name(guardianRequest.name())
+            .loginId(guardianRequest.phone())
+            .loginPassword(guardianRequest.loginPassword())
+            .recipient(null)
+            .build();
         guardian = guardianRepository.save(guardian);
         return new GuardianResponse(guardian.getPhone(), guardian.getName(), guardian.isActive());
     }

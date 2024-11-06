@@ -29,6 +29,7 @@ public class Guardian extends BaseEntity {
     @Column(unique = true)
     private String loginId;
 
+    @Column(nullable = false)
     private String loginPassword;
 
     @Column(nullable = false, unique = true)
@@ -45,14 +46,23 @@ public class Guardian extends BaseEntity {
     private LocalTime alertTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_id",nullable = true)
     private Recipient recipient;
 
     @Builder
-    public Guardian(String phone, String name) {
+    protected Guardian(String loginId, String loginPassword, String phone, String name,
+        String lineUserId,
+        LocalTime alertTime, Recipient recipient) {
+        this.loginId = loginId;
+        this.loginPassword = loginPassword;
         this.phone = phone;
         this.name = name;
-        this.alertTime = LocalTime.of(9, 0); // 오전 9시로 초기화
+        this.lineUserId = lineUserId;
+        if(alertTime == null) {
+            alertTime = LocalTime.of(9, 0);
+        }
+        this.alertTime = alertTime;
+        this.recipient = recipient;
     }
 
     public void updateGuardian(String phone, String name) {
