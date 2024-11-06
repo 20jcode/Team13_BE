@@ -3,8 +3,9 @@ spring:
     name: dbdr
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
         format_sql: true

@@ -1,16 +1,15 @@
 package dbdr.testhelper;
 
+import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.security.dto.LoginRequest;
+import dbdr.security.dto.TokenDTO;
 import dbdr.security.model.Role;
 import java.util.Map;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
-import org.springframework.web.util.UriBuilder;
 
 public class TestHelper {
 
@@ -33,46 +32,17 @@ public class TestHelper {
         this.restClient = restClient;
     }
 
-    public TestHelper user(Guardian guardian){
-        user = guardian;
-        userRole = Role.GUARDIAN;
-        loginId = guardian.getLoginId();
-        password = guardian.getLoginPassword();
+    public TestHelper user(Role userRole,String loginId,String password){
+        this.userRole = userRole;
+        this.loginId = loginId;
+        this.password = password;
         return this;
     }
-
-    public TestHelper user(Careworker careworker){
-        user = careworker;
-        userRole = Role.CAREWORKER;
-        loginId = careworker.getLoginId();
-        password = careworker.getLoginPassword();
-        return this;
-    }
-
-    public TestHelper user(Institution institution){
-        user = institution;
-        userRole = Role.INSTITUTION;
-        loginId = institution.getLoginId();
-        password = institution.getLoginPassword();
-        return this;
-    }
-    /* TODO : admin
-    public TestHelper admin(){
-        user = Institution.builder().institutionName("admin").institutionNumber(0L).build();
-        userRole = Role.ADMIN;
-    }
-
-     */
-
     public TestHelper uri(String uri){
         this.uri = uri;
         return this;
     }
 
-    public TestHelper queryParam(String key, String value){
-        queryParam.put(key,value);
-        return this;
-    }
     public TestHelper requestBody(Object requestBody){
         this.requestBody = requestBody;
         return this;
@@ -80,11 +50,7 @@ public class TestHelper {
 
     public ResponseSpec get(){
         authHeader = userLogin();
-        return restClient.get().uri(uriBuilder -> {
-            var ans = uriBuilder.path(uri);
-            queryParam.forEach(ans::queryParam);
-            return ans.build();
-        }).header("Authorization",authHeader).retrieve();
+        return restClient.get().uri(uri).header("Authorization",authHeader).retrieve();
     }
 
     public ResponseSpec post(){
@@ -104,7 +70,9 @@ public class TestHelper {
 
 
     private String userLogin() {
-        return restClient.post().uri("/login").body(convertUserToLoginRequest()).retrieve().toEntity(String.class).getBody();
+        TokenDTO tokenDTO = restClient.post().uri("/auth/login/"+userRole.toString()).body(convertUserToLoginRequest()).retrieve().toEntity(
+            TokenDTO.class).getBody();
+        return "Bearer "+tokenDTO.accessToken();
     }
 
     private LoginRequest convertUserToLoginRequest(){

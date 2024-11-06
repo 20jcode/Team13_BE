@@ -1,16 +1,11 @@
 package dbdr.testhelper;
 
 import com.linecorp.bot.client.LineMessagingClient;
-import dbdr.domain.admin.Admin;
-import dbdr.domain.admin.AdminService;
+import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.careworker.service.CareworkerMessagingService;
 import dbdr.domain.careworker.service.CareworkerService;
 import dbdr.domain.chart.dto.ChartMapper;
-import dbdr.domain.chart.dto.request.BodyManagementRequest;
-import dbdr.domain.chart.dto.request.ChartDetailRequest;
-import dbdr.domain.chart.entity.BodyManagement;
 import dbdr.domain.chart.entity.Chart;
 import dbdr.domain.chart.repository.ChartRepository;
 import dbdr.domain.chart.service.ChartService;
@@ -23,24 +18,20 @@ import dbdr.domain.institution.service.InstitutionService;
 import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.service.RecipientService;
-import dbdr.global.configuration.LineMessagingClientConfig;
 import java.util.ArrayList;
 import java.util.List;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
+import dbdr.domain.admin.service.AdminService;
 
 @TestPropertySource("classpath:application.yml")
 @Component
+@Transactional
 public class TestHelperFactory {
 
     @MockBean
@@ -79,7 +70,37 @@ public class TestHelperFactory {
     private List<Chart> charts = new ArrayList<>();
     private List<Admin> admins = new ArrayList<>();
 
-    public TestHelperFactory addGuardian(Guardian guardian) {
+    public TestHelper create(Integer port) {
+        serviceInit();
+        RestClient restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/v1")
+            .defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+            .build();
+        testHelper = new TestHelper(port, restClient);
+        return testHelper;
+    }
+
+    private void serviceInit() {
+        for (Admin admin : admins) {
+            adminService.addAdmin(admin);
+        }
+        for (InstitutionRequest institutionRequest : institutions) {
+            institutionService.addInstitution(institutionRequest);
+        }
+
+        for (Chart chart : charts) {
+            chartRepository.save(chart);
+        }
+
+        for (CareworkerRequest careworkerRequest : careworkers) {
+            careworkerService.addCareworker(careworkerRequest);
+        }
+
+        for (GuardianRequest guardianRequest : guardians) {
+            guardianService.addGuardian(guardianRequest);
+        }
+    }
+
+     public TestHelperFactory addGuardian(Guardian guardian) {
         GuardianRequest guardianRequest = convertGuardian(guardian);
         guardians.add(guardianRequest);
         return this;
@@ -112,40 +133,9 @@ public class TestHelperFactory {
         return this;
     }
 
-    public TestHelperFactory addAdmin() {
-        Admin admin = new Admin("admin", "adminpassword");
+    public TestHelperFactory addAdmin(Admin admin) {
         admins.add(admin);
         return this;
-    }
-
-    public TestHelper create(Integer port) {
-        serviceInit();
-        RestClient restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/v1")
-            .defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
-            .build();
-        testHelper = new TestHelper(port, restClient);
-        return testHelper;
-    }
-
-    private void serviceInit() {
-        for (Admin admin : admins) {
-            adminService.addAdmin(admin);
-        }
-        for (InstitutionRequest institutionRequest : institutions) {
-            institutionService.addInstitution(institutionRequest);
-        }
-
-        for (Chart chart : charts) {
-            chartRepository.save(chart);
-        }
-
-        for (CareworkerRequest careworkerRequest : careworkers) {
-            careworkerService.addCareworker(careworkerRequest);
-        }
-
-        for (GuardianRequest guardianRequest : guardians) {
-            guardianService.addGuardian(guardianRequest);
-        }
     }
 
     private GuardianRequest convertGuardian(Guardian guardian) {
