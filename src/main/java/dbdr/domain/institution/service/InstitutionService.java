@@ -19,7 +19,7 @@ public class InstitutionService {
 
     public InstitutionResponse getInstitutionById(Long institutionId) {
         Institution institution = getInstitution(institutionId);
-        return new InstitutionResponse(institution.getInstitutionNumber(),
+        return new InstitutionResponse(institution.getId(),institution.getInstitutionNumber(),
             institution.getInstitutionName());
     }
 
@@ -29,14 +29,14 @@ public class InstitutionService {
         Institution institution = getInstitution(institutionId);
         institution.updateInstitution(institutionRequest.institutionNumber(), institutionRequest.institutionName());
         institutionRepository.save(institution);
-        return new InstitutionResponse(institutionRequest.institutionNumber(),
+        return new InstitutionResponse(institution.getId(),institutionRequest.institutionNumber(),
             institutionRequest.institutionName());
     }
 
     public List<InstitutionResponse> getAllInstitution() {
         List<Institution> institutionList = institutionRepository.findAll();
         return institutionList.stream().map(
-            institution -> new InstitutionResponse(institution.getInstitutionNumber(),
+            institution -> new InstitutionResponse(institution.getId(),institution.getInstitutionNumber(),
                 institution.getInstitutionName())).toList();
     }
 
@@ -45,7 +45,7 @@ public class InstitutionService {
         Institution institution = new Institution(institutionRequest.institutionNumber(),
             institutionRequest.institutionName());
         institution = institutionRepository.save(institution);
-        return new InstitutionResponse(institution.getInstitutionNumber(),
+        return new InstitutionResponse(institution.getId(),institution.getInstitutionNumber(),
             institution.getInstitutionName());
     }
 
