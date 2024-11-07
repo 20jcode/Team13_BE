@@ -3,11 +3,15 @@ package dbdr.domain.institution.controller;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.domain.institution.service.InstitutionService;
+import dbdr.security.model.AuthParam;
+import dbdr.security.model.DbdrAuth;
+import dbdr.security.model.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/${spring.app.version}/admin/institution")
 @RequiredArgsConstructor
+@Slf4j
 public class InstitutionAdminController {
 
     private final InstitutionService institutionService;
 
     @Operation(summary = "전체 요양원 정보 조회")
     @GetMapping
+    @DbdrAuth(targetRole = Role.ADMIN)
     public ResponseEntity<List<InstitutionResponse>> showAllInstitution() {
         List<InstitutionResponse> institutionResponseList = institutionService.getAllInstitution();
         return ResponseEntity.ok(institutionResponseList);
@@ -36,13 +42,16 @@ public class InstitutionAdminController {
 
     @Operation(summary = "요양원 하나의 정보 조회")
     @GetMapping("/{institutionId}")
+    @DbdrAuth(targetRole = Role.INSTITUTION,authParam = AuthParam.INSTITUTION_ID, id = "#institutionId")
     public ResponseEntity<InstitutionResponse> showOneInstitution(@PathVariable("institutionId") Long institutionId) {
         InstitutionResponse institutionResponse = institutionService.getInstitutionById(institutionId);
+        log.info("admin institution 컨트롤러 단일 정보 조회 : {}",institutionResponse.institutionName());
         return ResponseEntity.ok(institutionResponse);
     }
 
     @Operation(summary = "요양원 추가")
     @PostMapping
+    @DbdrAuth(targetRole = Role.ADMIN)
     public ResponseEntity<InstitutionResponse> addInstitution(
         @Valid @RequestBody InstitutionRequest institutionRequest) {
         InstitutionResponse institutionResponse = institutionService.addInstitution(
@@ -52,6 +61,7 @@ public class InstitutionAdminController {
 
     @Operation(summary = "요양원 정보 수정")
     @PutMapping("/{institutionId}")
+    @DbdrAuth(targetRole = Role.INSTITUTION,authParam = AuthParam.INSTITUTION_ID, id = "#institutionId")
     public ResponseEntity<InstitutionResponse> updateInstitution(@PathVariable("institutionId") Long institutionId,
         @Valid @RequestBody InstitutionRequest institutionRequest) {
         InstitutionResponse institutionResponse = institutionService.updateInstitution(institutionId,
@@ -61,6 +71,7 @@ public class InstitutionAdminController {
 
     @Operation(summary = "요양원 삭제")
     @DeleteMapping("/{institutionId}")
+    @DbdrAuth(targetRole = Role.ADMIN)
     public ResponseEntity<Void> deleteInstitution(@PathVariable("institutionId") Long institutionId) {
         institutionService.deleteInstitutionById(institutionId);
         return ResponseEntity.noContent().build();

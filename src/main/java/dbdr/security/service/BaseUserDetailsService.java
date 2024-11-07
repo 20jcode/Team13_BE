@@ -42,14 +42,15 @@ public class BaseUserDetailsService {
     }
 
     private BaseUserDetails getInstitutionDetails(String userId) {
-        if (!institutionRepository.existsByInstitutionNumber(Long.parseLong(userId))) {
+        if (!institutionRepository.existsByLoginId(userId)) {
+            log.info("해당 로그인 ID는 요양원 table에 존재하지 않습니다. id : {}", userId);
             throw new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND);
         }
 
-        Institution institution = institutionRepository.findByInstitutionNumber(Long.parseLong(userId));
+        Institution institution = institutionRepository.findByLoginId(userId);
 
-        return securityRegister(institution.getId(), institution.getInstitutionNumber().toString(),
-            institution.getLoginPassword(), Role.INSTITUTION);
+        return securityRegister(institution.getId(), institution.getLoginId(),
+            institution.getLoginPassword(), Role.INSTITUTION, institution.getId());
     }
 
     private BaseUserDetails getCareWorkerDetails(String userId) {
@@ -57,7 +58,7 @@ public class BaseUserDetailsService {
         Careworker careWorker = careWorkerRepository.findByPhone(userId)
             .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND));
         return securityRegister(careWorker.getId(), careWorker.getPhone(),
-            careWorker.getLoginPassword(), Role.CAREWORKER);
+            careWorker.getLoginPassword(), Role.CAREWORKER,careWorker.getInstitution().getId());
     }
 
     private BaseUserDetails getAdminDetails(String username) {
@@ -67,12 +68,12 @@ public class BaseUserDetailsService {
     }
 
     private BaseUserDetails getGuadianDetails(String userId) {
-        log.debug("보호자 userId : {}", userId);
+        log.info("보호자 userId : {}", userId);
         Guardian guardian = guardianRepository.findByPhone(userId)
             .orElseThrow(() -> new ApplicationException(ApplicationError.GUARDIAN_NOT_FOUND));
 
         return securityRegister(guardian.getId(), guardian.getPhone(), guardian.getLoginPassword(),
-            Role.GUARDIAN);
+            Role.GUARDIAN, guardian.getRecipient().getInstitution().getId());
     }
 
     private BaseUserDetails securityRegister(Long id, String username, String password, Role role) {
@@ -81,8 +82,14 @@ public class BaseUserDetailsService {
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails,
             userDetails.getPassword(), userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.debug("security register : {}", userDetails.getUserLoginId());
+        log.info("security register : {}", userDetails.getUserLoginId());
         return userDetails;
+    }
+
+    private BaseUserDetails securityRegister(Long id,String username, String password,Role role,Long instituionId){
+        BaseUserDetails baseUserDetails = securityRegister(id,username,password,role);
+        baseUserDetails.setInstitutionId(instituionId);
+        return baseUserDetails;
     }
 
 }

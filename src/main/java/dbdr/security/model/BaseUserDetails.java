@@ -6,12 +6,9 @@ import java.util.Collection;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-@RequiredArgsConstructor
-@Builder
 @Getter
 public class BaseUserDetails implements UserDetails {
 
@@ -20,10 +17,25 @@ public class BaseUserDetails implements UserDetails {
     private final String userLoginId;
     @NonNull
     private final Role role;
-    private final Long institutionId;
+    private Long institutionId; //TODO : final 처리를 위해 BaseUserDetails 를 바꿔줘야함.
 
     private final String password;
 
+    @Builder
+    public BaseUserDetails(Long id, @NonNull String userLoginId, @NonNull Role role,
+        String password) {
+        this.id = id;
+        this.userLoginId = userLoginId;
+        this.role = role;
+        this.password = password;
+    }
+
+    @Builder
+    public BaseUserDetails(Long id, @NonNull String userLoginId, @NonNull Role role,
+        String password, Long institutionId) {
+        this(id, userLoginId, role, password);
+        this.institutionId = institutionId;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -58,4 +70,7 @@ public class BaseUserDetails implements UserDetails {
         return role.equals(Role.GUARDIAN);
     }
 
+    public void setInstitutionId(Long instituionId) {
+        this.institutionId = instituionId;
+    }
 }

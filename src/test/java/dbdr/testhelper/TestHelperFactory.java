@@ -3,6 +3,7 @@ package dbdr.testhelper;
 import com.linecorp.bot.client.LineMessagingClient;
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.admin.repository.AdminRepository;
+import dbdr.domain.admin.service.AdminService;
 import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.careworker.repository.CareworkerRepository;
@@ -28,14 +29,12 @@ import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-import dbdr.domain.admin.service.AdminService;
 
 @TestPropertySource("classpath:application.yml")
 @Component
@@ -179,8 +178,7 @@ public class TestHelperFactory {
     }
 
     private InstitutionRequest convertInstitution(Institution institution) {
-        return new InstitutionRequest(institution.getInstitutionNumber(),
-            institution.getInstitutionName());
+        return null;
     }
 
     private RecipientRequest convertRecipient(Recipient recipient) {

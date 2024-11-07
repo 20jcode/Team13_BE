@@ -1,11 +1,8 @@
 package dbdr.security.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.chart.entity.Chart;
-import dbdr.domain.core.base.entity.BaseEntity;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.institution.entity.Institution;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +19,7 @@ class DbdrAcessTest {
         DbdrAcess dbdrAcess = new DbdrAcess();
 
         //접근한 사용자는 관리자
-        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.ADMIN,0L,"password");
+        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.ADMIN,"password");
 
         //접근 테스트 대상
         Institution institution = Institution.builder().build();
@@ -49,7 +46,7 @@ class DbdrAcessTest {
         DbdrAcess dbdrAcess = new DbdrAcess();
 
         //접근한 사용자는 요양원
-        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.INSTITUTION,1L,"password");
+        BaseUserDetails userDetails = new BaseUserDetails(1L,"LoginId",Role.INSTITUTION,"password",1L);
 
         //접근 테스트 대상
         //Careworker careworker = Careworker.builder().institutionId(1L).build(); //같은 요양원 소속 요양보호사

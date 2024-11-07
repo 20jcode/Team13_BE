@@ -30,7 +30,9 @@ public class Institution extends BaseEntity {
     private String institutionName;
 
     @Builder
-    public Institution(Long institutionNumber, String institutionName) {
+    public Institution(String loginId,String loginPassword,Long institutionNumber, String institutionName) {
+        this.loginId = loginId;
+        this.loginPassword = loginPassword;
         this.institutionNumber = institutionNumber;
         this.institutionName = institutionName;
     }
@@ -38,5 +40,9 @@ public class Institution extends BaseEntity {
     public void updateInstitution(Long institutionNumber, String institutionName) {
         this.institutionNumber = institutionNumber;
         this.institutionName = institutionName;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.loginPassword = encodedPassword;
     }
 }

@@ -13,16 +13,18 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EntityMapperManager {
 
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
-    public EntityMapper getMapper(Class<?> object) {
+    public <E> EntityMapper<E> getMapper(Class<E> entityType) {
         Map<String, EntityMapper> beans = applicationContext.getBeansOfType(EntityMapper.class);
-        for (EntityMapper mapper : beans.values()) {
-            if (mapper.isSupports(object)) {
-                return mapper;
+        for (EntityMapper<?> mapper : beans.values()) {
+            if (mapper.isSupports(entityType)) {
+                return (EntityMapper<E>) mapper;
             }
         }
-        log.error("EntityMapper를 찾을 수 없습니다. object : {}", object);
+        log.error("EntityMapper를 찾을 수 없습니다. object : {}", entityType);
         throw new ApplicationException(ApplicationError.ILLIGAL_ARGUMENT);
     }
+
+
 }

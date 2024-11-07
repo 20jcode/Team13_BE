@@ -22,6 +22,7 @@ public class BaseAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
+
         BaseUserDetails unAuthUser = (BaseUserDetails) authentication.getPrincipal();
         BaseUserDetails authUser = baseUserDetailsService.loadUserByUsernameAndRole(unAuthUser.getUserLoginId(), unAuthUser.getRole());
 

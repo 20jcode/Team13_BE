@@ -8,10 +8,10 @@ import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.global.exception.ApplicationError;
+import dbdr.global.util.mapper.EntityMapper;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
 import dbdr.testhelper.TestHelperFactory;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.web.client.HttpClientErrorException;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,6 +32,9 @@ public class InstitutionTest {
 
     @Autowired
     TestHelperFactory testHelperFactory;
+
+    @Autowired
+    EntityMapper<Institution> institutionMapper;
 
     TestHelper testHelper;
 
@@ -49,9 +51,12 @@ public class InstitutionTest {
         //given
 
         Institution institution = Institution.builder().institutionName("김치덮밥요양원")
-            .institutionNumber(123123L).build();
-        InstitutionRequest institutionRequest = new InstitutionRequest(
-            institution.getInstitutionNumber(), institution.getInstitutionName());
+            .institutionNumber(123123L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
 
         //when
 
@@ -75,17 +80,30 @@ public class InstitutionTest {
         //given
 
         Institution institution = Institution.builder().institutionName("김치덮밥요양원")
-            .institutionNumber(123123L).build();
-        InstitutionRequest institutionRequest = new InstitutionRequest(
-            institution.getInstitutionNumber(), institution.getInstitutionName());
+            .institutionNumber(123123L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
 
         //요양원 번호 중복됨
-        InstitutionRequest institutionRequest2 = new InstitutionRequest(
-            institution.getInstitutionNumber(), "김치덮밥요양원아닙니다.");
+       Institution institution2 = Institution.builder().institutionName("김치덮밥요양원")
+            .institutionNumber(123123L)
+            .loginId("institutuion2")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest2 = institutionMapper.toRequest(institution2);
 
         //요양원 이름 중복됨
-        InstitutionRequest institutionRequest3 = new InstitutionRequest(123124L,
-            institution.getInstitutionName());
+        Institution institution3 = Institution.builder().institutionName("김치덮밥요양원")
+            .institutionNumber(123125L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest3 = institutionMapper.toRequest(institution3);
 
         //when
 
@@ -109,7 +127,7 @@ public class InstitutionTest {
         assertThatThrownBy(() -> {
             testHelper.user(Role.ADMIN, "testadmin", "adminpassword").uri("/admin/institution")
                 .requestBody(institutionRequest3).post().toEntity(InstitutionResponse.class);
-        }).hasMessageContaining(ApplicationError.DUPLICATE_INSTITUTION_NUMBER.getMessage());
+        }).hasMessageContaining(ApplicationError.DUPILCATE_INSTITUTION_NAME.getMessage());
 
     }
 
@@ -118,12 +136,13 @@ public class InstitutionTest {
     public void updateInstitutionTest() {
         //given
 
-        Institution institution = Institution.builder()
-            .institutionName("김치덮밥요양원")
-            .institutionNumber(123123L).build();
+        Institution institution = Institution.builder().institutionName("김치덮밥요양원")
+            .institutionNumber(123123L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
 
-        InstitutionRequest institutionRequest =
-            new InstitutionRequest(institution.getInstitutionNumber(), institution.getInstitutionName());
+        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
 
             //요양원 등록
         var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
@@ -137,7 +156,7 @@ public class InstitutionTest {
 
             //수정할 요양원 정보 : 요양원 이름과 번호 변경
         InstitutionRequest updateRequest =
-            new InstitutionRequest(1233L, "김치찌개요양원");
+            new InstitutionRequest(1233L, "김치찌개요양원", "institutuion3232", "password");
 
         //when
 
@@ -154,5 +173,81 @@ public class InstitutionTest {
         assertThat(updateResponse.getBody().institutionName()).isEqualTo("김치찌개요양원");
         assertThat(updateResponse.getBody().institutionNumber()).isEqualTo(1233L);
     }
+
+    @Test
+    @DisplayName("본인 요양원만 접근 가능, 타 요양원 접근 거부")
+    void institutionAuthTest(){
+        //given
+
+        //요양원 1 생성
+        Institution institution = Institution.builder().institutionName("김치덮밥요양원")
+            .institutionNumber(123123L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
+
+         //요양원 2 생성
+        Institution institution2 = Institution.builder().institutionName("카레요양원")
+            .institutionNumber(1231443L)
+            .loginId("institutuion2")
+            .loginPassword("password")
+            .build();
+
+        InstitutionRequest institutionRequest2 = institutionMapper.toRequest(institution2);
+        //서버 관리자가 요양원들을 등록함
+
+        var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
+            .uri("/admin/institution")
+            .requestBody(institutionRequest)
+            .post()
+            .toEntity(InstitutionResponse.class);
+
+        var response2 = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
+            .uri("/admin/institution")
+            .requestBody(institutionRequest2)
+            .post()
+            .toEntity(InstitutionResponse.class);
+
+        //요양원 id
+        long id = response.getBody().id();
+        long id2 = response2.getBody().id();
+
+        //when
+
+        //보인 요양원 정보 조회
+        var showResponse = testHelper.user(Role.INSTITUTION, "institutuion1", "password")
+            .uri("/admin/institution/"+id)
+            .get()
+            .toEntity(InstitutionResponse.class);
+
+        assertThat(showResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        //본인 요양원 정보 수정 시도
+        var updateResponse = testHelper.user(Role.INSTITUTION, "institutuion1", "password")
+            .uri("/admin/institution/"+id)
+            .requestBody(institutionRequest)
+            .put()
+            .toEntity(InstitutionResponse.class);
+
+        //then
+        assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(updateResponse.getBody().institutionName()).isEqualTo("김치덮밥요양원");
+        assertThat(updateResponse.getBody().institutionNumber()).isEqualTo(123123L);
+
+        //타 요양원 정보 수정 시도 실패
+        assertThatThrownBy(() -> {
+            testHelper.user(Role.INSTITUTION, "institutuion1", "password")
+                .uri("/admin/institution/"+id2) //다른 요양원에 접근
+                .requestBody(institutionRequest2)
+                .put()
+                .toEntity(InstitutionResponse.class);
+        }).hasMessageContaining(ApplicationError.ACCESS_NOT_ALLOWED.name());
+
+
+
+    }
+
 
 }

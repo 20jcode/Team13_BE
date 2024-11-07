@@ -13,30 +13,30 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DbdrAcess {
 
-    public boolean hasAccessPermission(Role role,BaseUserDetails userDetails, BaseEntity baseEntity) {
-        log.info("권한확인 메소드 동작 시작 : role : {}, userDetails : {}, baseEntity : {}", role, userDetails, baseEntity);
-        //admin
-        if(userDetails.isAdmin()){
+    public boolean hasAccessPermission(Role role,BaseUserDetails authLoginUser, BaseEntity accessTarget) {
+        log.info("권한확인 메소드 동작 시작 : role : {}, userDetails : {}, baseEntity : {}", role, authLoginUser, accessTarget);
+
+        if(authLoginUser.isAdmin()){
             return true;
         }
 
-        if(!hasRequiredRole(role, userDetails)){
+        if(!hasRequiredRole(role, authLoginUser)){
             return false;
         }
-        if (baseEntity instanceof Institution) {
-            return hasAccessPermission(userDetails, (Institution) baseEntity);
+        if (accessTarget instanceof Institution) {
+            return hasAccessPermission(authLoginUser, (Institution) accessTarget);
         }
-        if (baseEntity instanceof Careworker) {
-            return hasAccessPermission(userDetails, (Careworker) baseEntity);
+        if (accessTarget instanceof Careworker) {
+            return hasAccessPermission(authLoginUser, (Careworker) accessTarget);
         }
-        if (baseEntity instanceof Guardian) {
-            return hasAccessPermission(userDetails, (Guardian) baseEntity);
+        if (accessTarget instanceof Guardian) {
+            return hasAccessPermission(authLoginUser, (Guardian) accessTarget);
         }
-        if (baseEntity instanceof Chart) {
-            return hasAccessPermission(userDetails, (Chart) baseEntity);
+        if (accessTarget instanceof Chart) {
+            return hasAccessPermission(authLoginUser, (Chart) accessTarget);
         }
-        if (baseEntity instanceof Recipient) {
-            return hasAccessPermission(userDetails, (Recipient) baseEntity);
+        if (accessTarget instanceof Recipient) {
+            return hasAccessPermission(authLoginUser, (Recipient) accessTarget);
         }
         return false;
     }
@@ -104,6 +104,24 @@ public class DbdrAcess {
         if(userDetails.isGuardian()){
             return userDetails.getId().equals(recipient.getGuardian().getId());
         }
+        return false;
+    }
+
+    //특정 소속 확인없이 단순한 권한 검사만을 위해 존재
+    public boolean hasRole(Role role, BaseUserDetails baseUserDetails) {
+        if(baseUserDetails.isAdmin()){
+            return true;
+        } //관리자는 무조건 통과
+        if(role.equals(Role.INSTITUTION) && baseUserDetails.isInstitution()){
+            return true;
+        }
+        if(role.equals(Role.CAREWORKER) && (baseUserDetails.isInstitution() ||baseUserDetails.isCareworker())){
+            return true;
+        }
+        if(role.equals(Role.GUARDIAN) && (baseUserDetails.isInstitution() || baseUserDetails.isGuardian())){
+            return true;
+        }
+        log.info("권한 부족으로 인한 거부 : role : {}, userDetails : {}", role, baseUserDetails);
         return false;
     }
 }

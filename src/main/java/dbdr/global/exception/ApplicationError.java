@@ -39,6 +39,8 @@ public enum ApplicationError {
     DUPLICATE_PHONE(HttpStatus.CONFLICT, "이미 존재하는 전화번호입니다."),
     DUPLICATE_CARE_NUMBER(HttpStatus.CONFLICT, "이미 존재하는 장기요양번호입니다."),
     DUPLICATE_INSTITUTION_NUMBER(HttpStatus.CONFLICT, "이미 존재하는 요양기관번호입니다."),
+    DUPILCATE_INSTITUTION_NAME(HttpStatus.CONFLICT, "이미 존재하는 요양기관명입니다."),
+    DUPILCATE_INSTITUTION_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 요양기관 로그인 아이디입니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못된 입력값입니다."),
     INVALID_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "잘못된 입력입니다. 010XXXXXXXX 형식으로 입력해주세요."),
 

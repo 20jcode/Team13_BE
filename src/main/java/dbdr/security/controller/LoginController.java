@@ -38,7 +38,7 @@ public class LoginController {
     @PostMapping("/login/{role}")
     public ResponseEntity<TokenDTO> login(@PathVariable("role") String role,
                                           @RequestBody @Valid LoginRequest loginRequest) {
-        log.debug("로그인 요청 받음 : 역할 = {}, id : {}, password : {}", role,loginRequest.userId(), loginRequest.password());
+        log.info("로그인 요청 받음 : 역할 = {}, id : {}, password : {}", role,loginRequest.userId(), loginRequest.password());
         Role roleEnum = roleCheck(role);
         TokenDTO token = loginService.login(roleEnum, loginRequest);
         return ResponseEntity.ok().header(authHeader, token.accessToken()).body(token);

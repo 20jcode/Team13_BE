@@ -39,7 +39,9 @@ public class DbdrSeucrityService {
         log.info("권한확인 메소드 동작 시작 : role : {}, authParam : {}, id : {}", role, authParam, id);
         BaseUserDetails baseUserDetails = (BaseUserDetails) SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-
+        if(authParam.equals(AuthParam.NONE) && id.isEmpty()){
+            return dbdrAcess.hasRole(role,baseUserDetails);
+        }
         return dbdrAcess.hasAccessPermission(role,baseUserDetails, findEntity(authParam, Long.parseLong(id)));
 
     }
