@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dbdr.domain.admin.entity.Admin;
+import dbdr.domain.careworker.dto.request.CareworkerRequest;
+import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.global.exception.ApplicationError;
-import dbdr.global.util.mapper.EntityMapper;
+import dbdr.global.util.mapper.EntityMapperManager;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
 import dbdr.testhelper.TestHelperFactory;
@@ -34,7 +36,7 @@ public class InstitutionTest {
     TestHelperFactory testHelperFactory;
 
     @Autowired
-    EntityMapper<Institution> institutionMapper;
+    EntityMapperManager emm;
 
     TestHelper testHelper;
 
@@ -56,7 +58,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
+        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
 
         //when
 
@@ -85,7 +87,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
+        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
 
         //요양원 번호 중복됨
        Institution institution2 = Institution.builder().institutionName("김치덮밥요양원")
@@ -94,7 +96,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest2 = institutionMapper.toRequest(institution2);
+        InstitutionRequest institutionRequest2 = emm.getMapper(Institution.class).toRequest(institution2);
 
         //요양원 이름 중복됨
         Institution institution3 = Institution.builder().institutionName("김치덮밥요양원")
@@ -103,7 +105,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest3 = institutionMapper.toRequest(institution3);
+        InstitutionRequest institutionRequest3 = emm.getMapper(Institution.class).toRequest(institution3);
 
         //when
 
@@ -142,7 +144,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
+        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
 
             //요양원 등록
         var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
@@ -186,7 +188,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest = institutionMapper.toRequest(institution);
+        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
 
          //요양원 2 생성
         Institution institution2 = Institution.builder().institutionName("카레요양원")
@@ -195,7 +197,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest2 = institutionMapper.toRequest(institution2);
+        InstitutionRequest institutionRequest2 = emm.getMapper(Institution.class).toRequest(institution2);
         //서버 관리자가 요양원들을 등록함
 
         var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
@@ -245,9 +247,85 @@ public class InstitutionTest {
                 .toEntity(InstitutionResponse.class);
         }).hasMessageContaining(ApplicationError.ACCESS_NOT_ALLOWED.name());
 
+    }
+
+    @Test
+    @DisplayName("요양보호사는 요양원 Role에 접근 불가 테스트")
+    void testGuardianInsti(){
+        Institution institution = Institution.builder()
+            .institutionName("김치덮밥요양원")
+            .institutionNumber(123123L)
+            .loginId("institutuion1")
+            .loginPassword("password")
+            .build();
+
+        Careworker careworker = Careworker.builder()
+                .loginId("careworker1")
+                .loginPassword("password")
+                .name("김치밥")
+                .phone("01012345678")
+                .institution(institution)
+                .email("abcd@gmail.com")
+                .build();
+        /*
+        Recipient recipient = Recipient.builder()
+                .name("Dummy Name")
+                .birth(LocalDate.of(1980, 1, 1))
+                .gender("Male")
+                .careLevel("Level 1")
+                .careNumber("123456789")
+                .startDate(LocalDate.now())
+                .institution(institution)
+                .institutionNumber(1L)
+                .careworker(careworker)
+                .build();
+
+        Guardian guardian = Guardian.builder()
+            .loginPassword("password")
+            .name("김보호자")
+            .loginId("01012341234")
+            .phone("01012341234")
+            .recipient(recipient)
+            .build();
+        */
+
+        //요양원 생성
+        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
+
+
+        var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
+            .uri("/admin/institution")
+            .requestBody(institutionRequest)
+            .post()
+            .toEntity(InstitutionResponse.class);
+
+        long institutionId = response.getBody().id();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        //요양원에서 요양보호사 등록
+        CareworkerRequest careworkerRequest =
+            new CareworkerRequest("password", institutionId,"김치국", "abcd@gmail.com","01012311231");
+
+        var response2 = testHelper.user(Role.INSTITUTION, "institutuion1", "password")
+            .uri("/careworker/"+institutionId)
+            .requestBody(careworkerRequest)
+            .post()
+            .toEntity(InstitutionResponse.class);
+
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        //요양보호사가 요양원 Role에 접근 시도
+        assertThatThrownBy(() -> {
+            testHelper.user(Role.CAREWORKER, "01012311231", "password")
+                .uri("/admin/institution/"+institutionId)
+                .get()
+                .toEntity(InstitutionResponse.class);
+        }).hasMessageContaining(ApplicationError.ACCESS_NOT_ALLOWED.name());
 
 
     }
+
 
 
 }

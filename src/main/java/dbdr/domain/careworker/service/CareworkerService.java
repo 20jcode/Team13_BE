@@ -9,6 +9,7 @@ import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class CareworkerService {
 
     private final CareworkerRepository careworkerRepository;
     private final InstitutionRepository institutionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public List<CareworkerResponseDTO> getCareworkersByInstitution(Long institutionId) {
@@ -49,8 +51,8 @@ public class CareworkerService {
         Long institutionId = careworkerRequest.getInstitutionId();
         Institution institution = institutionRepository.findById(institutionId)
             .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
-        Careworker careworker = new Careworker(institution, careworkerRequest.getName(),
-                careworkerRequest.getEmail(), careworkerRequest.getPhone());
+        Careworker careworker = new Careworker(careworkerRequest.getEmail(),passwordEncoder.encode(careworkerRequest.getLoginPassword()), institution,
+            careworkerRequest.getName(), careworkerRequest.getEmail(), careworkerRequest.getPhone());
 
         careworkerRepository.save(careworker);
         return toResponseDTO(careworker);

@@ -46,7 +46,7 @@ public class InstitutionService {
     }
 
     public InstitutionResponse addInstitution(InstitutionRequest institutionRequest) {
-        ensureUniqueInstitutionNumber(null,institutionRequest.institutionNumber());
+        ensureUniqueInstitutionNumber(institutionRequest.institutionNumber());
         ensureUniqueInstitutionName(institutionRequest.institutionName());
         ensureUniqueInstitutionLoginId(institutionRequest.institutionLoginId());
 
@@ -64,10 +64,16 @@ public class InstitutionService {
         institutionRepository.delete(institution);
     }
 
+    private void ensureUniqueInstitutionNumber(Long institutionNumber) {
+        if (institutionRepository.existsByInstitutionNumber(institutionNumber)) {
+            throw new ApplicationException(ApplicationError.DUPLICATE_INSTITUTION_NUMBER);
+        }
+    }
+
     //본인 요양원이 아니면서 이미 존재하는 번호인지 확인 필요
     private void ensureUniqueInstitutionNumber(Long institutionId,Long institutionNumber) {
         if (institutionRepository.existsByInstitutionNumber(institutionNumber)) {
-            if(institutionId!=null && !Objects.equals(
+            if(!Objects.equals(
                 institutionRepository.findByInstitutionNumber(institutionNumber).getId(), institutionId)){
                 //변경하려는 요양원 번호가 자신이 pk가 아닌 경우
                 throw new ApplicationException(ApplicationError.DUPLICATE_INSTITUTION_NUMBER);

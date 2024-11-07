@@ -24,8 +24,7 @@ import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import dbdr.global.util.mapper.EntityMapperManager;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,8 +82,8 @@ public class TestHelperFactory {
     @Autowired
     ChartMapper chartMapper;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    EntityMapperManager emm;
 
     private TestHelper testHelper;
 
@@ -173,12 +172,11 @@ public class TestHelperFactory {
     }
 
     private CareworkerRequest convertCareworker(Careworker careworker) {
-        return new CareworkerRequest(careworker.getInstitution().getId(), careworker.getName(),
-            careworker.getEmail(), careworker.getPhone());
+        return emm.getMapper(Careworker.class).toRequest(careworker);
     }
 
     private InstitutionRequest convertInstitution(Institution institution) {
-        return null;
+        return emm.getMapper(Institution.class).toRequest(institution);
     }
 
     private RecipientRequest convertRecipient(Recipient recipient) {

@@ -15,6 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CareworkerRequest {
 
+    @Schema(description = "로그인비밀번호", example = "password")
+    @NotBlank(message = "로그인 비밀번호는 필수 항목입니다.")
+    private String loginPassword;
+
     @Schema(description = "요양기관아이디", example = "1")
     @NotNull(message = "요양기관 아이디는 필수 항목입니다.")
     private Long institutionId;
