@@ -51,9 +51,7 @@ public abstract class ChartMapper {
             @Mapping(target = "wash", source = "physicalClear.wash"),
             @Mapping(target = "bath", source = "physicalClear.bath"),
             @Mapping(target = "mealType", source = "physicalMeal.mealType"),
-            @Mapping(target = "intakeAmount", source = "physicalMeal.intakeAmount"),
-            @Mapping(target = "has_walked", source = "physicalWalk.hasWalked"),
-            @Mapping(target = "has_companion", source = "physicalWalk.hasCompanion"),
+            @Mapping(target = "intakeAmount", source = "physicalMeal.intakeAmount")
     })
     public abstract BodyManagementResponse toResponse(BodyManagement bodyManagement);
 
@@ -61,9 +59,7 @@ public abstract class ChartMapper {
             @Mapping(target = "physicalClear.wash", source = "wash"),
             @Mapping(target = "physicalClear.bath", source = "bath"),
             @Mapping(target = "physicalMeal.mealType", source = "mealType"),
-            @Mapping(target = "physicalMeal.intakeAmount", source = "intakeAmount"),
-            @Mapping(target = "physicalWalk.hasWalked", source = "has_walked"),
-            @Mapping(target = "physicalWalk.hasCompanion", source = "has_companion")
+            @Mapping(target = "physicalMeal.intakeAmount", source = "intakeAmount")
     })
     public abstract BodyManagement toEntity(BodyManagementRequest request);
 

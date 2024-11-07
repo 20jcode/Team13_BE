@@ -18,7 +18,7 @@ import dbdr.domain.chart.entity.HealthBloodPressure;
 import dbdr.domain.chart.entity.NursingManagement;
 import dbdr.domain.chart.entity.PhysicalClear;
 import dbdr.domain.chart.entity.PhysicalMeal;
-import dbdr.domain.chart.entity.PhysicalWalk;
+import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.service.RecipientService;
 import java.time.LocalDate;
@@ -54,6 +54,10 @@ public class ChartMapperTest {
     void testToEntity_chartDetailRequestToChart() {
         // given
         Long recipientId = 1L;
+        Institution institution = Institution.builder()
+                .institutionName("HealthCare Institution")
+                .institutionNumber(100L)
+                .build();
         Recipient recipient = Recipient.builder()
                 .name("John Doe")
                 .birth(LocalDate.of(1950, 1, 1))
@@ -61,7 +65,7 @@ public class ChartMapperTest {
                 .careLevel("Level 1")
                 .careNumber("12345678")
                 .startDate(LocalDate.of(2020, 1, 1))
-                .institution("HealthCare Institution")
+                .institution(institution)
                 .institutionNumber(100L)
                 .build();
 
@@ -69,10 +73,10 @@ public class ChartMapperTest {
         ChartDetailRequest request = new ChartDetailRequest(
                 "Flu",
                 recipientId,
-                new BodyManagementRequest(true, false, "Lunch", "Full", 3, true, false, "Good"),
-                new NursingManagementRequest(120, 80, "36.5", "All good"),
-                new CognitiveManagementRequest(true, "No issues"),
-                new RecoveryTrainingRequest("Physical Therapy", true, "Completed")
+                new BodyManagementRequest(true, false, "Lunch", "Full", 3, true, false, true, "Good"),
+                new NursingManagementRequest(120, 80, "36.5", true, true, true, "All good"),
+                new CognitiveManagementRequest(true, true, "No issues"),
+                new RecoveryTrainingRequest("Physical Therapy", true, true, true, "Completed")
         );
 
         // when
@@ -93,8 +97,8 @@ public class ChartMapperTest {
         // given
         PhysicalClear physicalClear = new PhysicalClear(true, false);
         PhysicalMeal physicalMeal = new PhysicalMeal("Lunch", "Full");
-        PhysicalWalk physicalWalk = new PhysicalWalk(true, false);
-        BodyManagement bodyManagement = new BodyManagement(physicalMeal, physicalWalk, physicalClear, 3, "Good");
+
+        BodyManagement bodyManagement = new BodyManagement(physicalMeal, physicalClear, 3, "Good", true, true, true);
 
         // when
         BodyManagementResponse response = chartMapper.toResponse(bodyManagement);
@@ -111,7 +115,7 @@ public class ChartMapperTest {
     void testToEntity_bodyManagementRequestToBodyManagement() {
         // given
         BodyManagementRequest request = new BodyManagementRequest(
-                true, false, "Lunch", "Full", 3, true, false, "Good"
+                true, false, "Lunch", "Full", 3, true, false, false, "Good"
         );
 
         // when
@@ -129,7 +133,8 @@ public class ChartMapperTest {
     void testToResponse_nursingManagementToNursingManagementResponse() {
         // given
         HealthBloodPressure healthBloodPressure = new HealthBloodPressure(120, 80);
-        NursingManagement nursingManagement = new NursingManagement(healthBloodPressure, "36.5", "All good");
+        NursingManagement nursingManagement = new NursingManagement(healthBloodPressure, "36.5", true, true, true,
+                "All good");
 
         // when
         NursingManagementResponse response = chartMapper.toResponse(nursingManagement);
@@ -143,7 +148,7 @@ public class ChartMapperTest {
     @Test
     void testToEntity_nursingManagementRequestToNursingManagement() {
         // given
-        NursingManagementRequest request = new NursingManagementRequest(120, 80, "36.5", "All good");
+        NursingManagementRequest request = new NursingManagementRequest(120, 80, "36.5", true, true, true, "All good");
 
         // when
         NursingManagement nursingManagement = chartMapper.toEntity(request);
