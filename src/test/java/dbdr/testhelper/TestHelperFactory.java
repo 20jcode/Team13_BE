@@ -4,7 +4,7 @@ import com.linecorp.bot.client.LineMessagingClient;
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.admin.repository.AdminRepository;
 import dbdr.domain.admin.service.AdminService;
-import dbdr.domain.careworker.dto.request.CareworkerRequest;
+import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.domain.careworker.service.CareworkerService;
@@ -20,7 +20,7 @@ import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.domain.institution.service.InstitutionService;
-import dbdr.domain.recipient.dto.request.RecipientRequest;
+import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
@@ -88,9 +88,9 @@ public class TestHelperFactory {
     private TestHelper testHelper;
 
     private List<GuardianRequest> guardians = new ArrayList<>();
-    private List<CareworkerRequest> careworkers = new ArrayList<>();
+    private List<CareworkerRequestDTO> careworkers = new ArrayList<>();
     private List<InstitutionRequest> institutions = new ArrayList<>();
-    private List<RecipientRequest> recipients = new ArrayList<>();
+    private List<RecipientRequestDTO> recipients = new ArrayList<>();
     private List<Chart> charts = new ArrayList<>();
     private List<Admin> admins = new ArrayList<>();
 
@@ -119,8 +119,8 @@ public class TestHelperFactory {
             chartRepository.save(chart);
         }
 
-        for (CareworkerRequest careworkerRequest : careworkers) {
-            careworkerService.addCareworker(careworkerRequest);
+        for (CareworkerRequestDTO careworkerRequestDTO : careworkers) {
+            careworkerService.addCareworker(careworkerRequestDTO);
         }
 
         for (GuardianRequest guardianRequest : guardians) {
@@ -135,8 +135,8 @@ public class TestHelperFactory {
     }
 
     public TestHelperFactory addCareworker(Careworker careworker) {
-        CareworkerRequest careworkerRequest = convertCareworker(careworker);
-        careworkers.add(careworkerRequest);
+        CareworkerRequestDTO careworkerRequestDTO = convertCareworker(careworker);
+        careworkers.add(careworkerRequestDTO);
         return this;
     }
 
@@ -147,8 +147,8 @@ public class TestHelperFactory {
     }
 
     public TestHelperFactory addRecipient(Recipient recipient) {
-        RecipientRequest recipientRequest = convertRecipient(recipient);
-        recipients.add(recipientRequest);
+        RecipientRequestDTO recipientRequestDTO = convertRecipient(recipient);
+        recipients.add(recipientRequestDTO);
         return this;
     }
 
@@ -171,7 +171,7 @@ public class TestHelperFactory {
             guardian.getLoginPassword());
     }
 
-    private CareworkerRequest convertCareworker(Careworker careworker) {
+    private CareworkerRequestDTO convertCareworker(Careworker careworker) {
         return emm.getMapper(Careworker.class).toRequest(careworker);
     }
 
@@ -179,8 +179,8 @@ public class TestHelperFactory {
         return emm.getMapper(Institution.class).toRequest(institution);
     }
 
-    private RecipientRequest convertRecipient(Recipient recipient) {
-        return new RecipientRequest();
+    private RecipientRequestDTO convertRecipient(Recipient recipient) {
+        return new RecipientRequestDTO();
     }
 
 }

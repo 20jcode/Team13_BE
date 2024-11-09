@@ -3,15 +3,14 @@ package dbdr.domain.careworker.service;
 import dbdr.domain.careworker.dto.request.CareworkerUpdateRequestDTO;
 import dbdr.domain.careworker.dto.response.CareworkerMyPageResponseDTO;
 import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.careworker.dto.request.CareworkerRequest;
+import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
 import dbdr.domain.careworker.dto.response.CareworkerResponseDTO;
 import dbdr.domain.careworker.repository.CareworkerRepository;
 import dbdr.domain.institution.entity.Institution;
-import dbdr.domain.institution.repository.InstitutionRepository;
+import dbdr.domain.institution.service.InstitutionService;
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +22,7 @@ import java.util.List;
 public class CareworkerService {
 
     private final CareworkerRepository careworkerRepository;
-    private final InstitutionRepository institutionRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final InstitutionService institutionService;
 
     @Transactional(readOnly = true)
     public List<CareworkerResponseDTO> getCareworkersByInstitution(Long institutionId) {
@@ -68,22 +66,27 @@ public class CareworkerService {
 
 
     @Transactional
-    public CareworkerResponseDTO addCareworker(CareworkerRequest careworkerRequest) {
-        ensureUniqueEmail(careworkerRequest.getEmail());
-        ensureUniquePhone(careworkerRequest.getPhone());
-        Long institutionId = careworkerRequest.getInstitutionId();
-        Institution institution = institutionRepository.findById(institutionId)
-            .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
-        Careworker careworker = new Careworker(careworkerRequest.getEmail(),passwordEncoder.encode(careworkerRequest.getLoginPassword()), institution,
-            careworkerRequest.getName(), careworkerRequest.getEmail(), careworkerRequest.getPhone());
+    public CareworkerResponseDTO createCareworker(CareworkerRequestDTO careworkerRequestDTO, Long institutionId) {
+        ensureUniqueEmail(careworkerRequestDTO.getEmail());
+        ensureUniquePhone(careworkerRequestDTO.getPhone());
+
+        Institution institution = institutionService.getInstitutionById(institutionId);
+        Careworker careworker = new Careworker(institution, careworkerRequestDTO.getName(),
+                careworkerRequestDTO.getEmail(), careworkerRequestDTO.getPhone());
 
         careworkerRepository.save(careworker);
         return toResponseDTO(careworker);
     }
 
     @Transactional
-    public CareworkerResponseDTO updateCareworker(Long careworkerId, CareworkerRequest careworkerDTO, Long institutionId) {
+    public CareworkerResponseDTO updateCareworker(Long careworkerId, CareworkerRequestDTO careworkerDTO, Long institutionId) {
         Careworker careworker = findCareworkerById(careworkerId);
+
+        Institution institution = institutionService.getInstitutionById(institutionId);
+        if (!careworker.getInstitution().equals(institution)) {
+            throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
+        }
+
         careworker.updateCareworker(careworkerDTO);
         return toResponseDTO(careworker);
     }

@@ -72,7 +72,8 @@ public class DbdrAcess {
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Guardian guardian) {
         if (userDetails.isInstitution()) {
-            return userDetails.getInstitutionId().equals(guardian.getRecipient().getInstitutionNumber());
+            //return userDetails.getInstitutionId().equals(guardian.getRecipient().getInstitutionNumber());
+            return false;
         }
         if(userDetails.isGuardian()){
             return userDetails.getId().equals(guardian.getId());

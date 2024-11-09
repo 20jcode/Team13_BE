@@ -30,9 +30,7 @@ public class Institution extends BaseEntity {
     private String institutionName;
 
     @Builder
-    public Institution(String loginId,String loginPassword,Long institutionNumber, String institutionName) {
-        this.loginId = loginId;
-        this.loginPassword = loginPassword;
+    public Institution(Long institutionNumber, String institutionName) {
         this.institutionNumber = institutionNumber;
         this.institutionName = institutionName;
     }

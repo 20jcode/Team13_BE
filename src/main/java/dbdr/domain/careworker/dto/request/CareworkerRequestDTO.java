@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CareworkerRequest {
+public class CareworkerRequestDTO {
 
     @Schema(description = "로그인비밀번호", example = "password")
     @NotBlank(message = "로그인 비밀번호는 필수 항목입니다.")

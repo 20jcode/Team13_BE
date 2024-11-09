@@ -43,6 +43,7 @@ public class GuardianService {
 
     public GuardianResponse addGuardian(GuardianRequest guardianRequest) {
         ensureUniquePhone(guardianRequest.phone());
+        /*
         Guardian guardian = Guardian.builder().phone(guardianRequest.phone())
             .name(guardianRequest.name())
             .loginId(guardianRequest.phone())
@@ -51,6 +52,10 @@ public class GuardianService {
             .build();
         guardian = guardianRepository.save(guardian);
         return new GuardianResponse(guardian.getPhone(), guardian.getName(), guardian.isActive());
+
+         */
+        return null;
+        //TODO
     }
 
     public void deleteGuardianById(Long guardianId) {

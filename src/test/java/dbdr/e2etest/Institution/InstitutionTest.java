@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dbdr.domain.admin.entity.Admin;
-import dbdr.domain.careworker.dto.request.CareworkerRequest;
+import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
@@ -304,12 +304,12 @@ public class InstitutionTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         //요양원에서 요양보호사 등록
-        CareworkerRequest careworkerRequest =
-            new CareworkerRequest("password", institutionId,"김치국", "abcd@gmail.com","01012311231");
+        CareworkerRequestDTO careworkerRequestDTO =
+            new CareworkerRequestDTO("password", institutionId,"김치국", "abcd@gmail.com","01012311231");
 
         var response2 = testHelper.user(Role.INSTITUTION, "institutuion1", "password")
             .uri("/careworker/"+institutionId)
-            .requestBody(careworkerRequest)
+            .requestBody(careworkerRequestDTO)
             .post()
             .toEntity(InstitutionResponse.class);
 
