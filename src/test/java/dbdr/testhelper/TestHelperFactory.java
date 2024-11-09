@@ -24,7 +24,6 @@ import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
-import dbdr.global.util.mapper.EntityMapperManager;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +81,6 @@ public class TestHelperFactory {
     @Autowired
     ChartMapper chartMapper;
 
-    @Autowired
-    EntityMapperManager emm;
 
     private TestHelper testHelper;
 
@@ -120,7 +117,7 @@ public class TestHelperFactory {
         }
 
         for (CareworkerRequestDTO careworkerRequestDTO : careworkers) {
-            careworkerService.addCareworker(careworkerRequestDTO);
+            careworkerService.createCareworker(careworkerRequestDTO, 1L);
         }
 
         for (GuardianRequest guardianRequest : guardians) {
@@ -172,11 +169,12 @@ public class TestHelperFactory {
     }
 
     private CareworkerRequestDTO convertCareworker(Careworker careworker) {
-        return emm.getMapper(Careworker.class).toRequest(careworker);
+        return new CareworkerRequestDTO();
     }
 
     private InstitutionRequest convertInstitution(Institution institution) {
-        return emm.getMapper(Institution.class).toRequest(institution);
+        return new InstitutionRequest(institution.getInstitutionNumber(), institution.getInstitutionName(),
+            institution.getLoginId(), institution.getLoginPassword());
     }
 
     private RecipientRequestDTO convertRecipient(Recipient recipient) {

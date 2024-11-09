@@ -10,7 +10,6 @@ import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.global.exception.ApplicationError;
-import dbdr.global.util.mapper.EntityMapperManager;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
 import dbdr.testhelper.TestHelperFactory;
@@ -22,11 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) //테스트 간에 독립성 유지
 public class InstitutionTest {
 
     @LocalServerPort
@@ -34,9 +31,6 @@ public class InstitutionTest {
 
     @Autowired
     TestHelperFactory testHelperFactory;
-
-    @Autowired
-    EntityMapperManager emm;
 
     TestHelper testHelper;
 
@@ -58,8 +52,7 @@ public class InstitutionTest {
             .loginPassword("password")
             .build();
 
-        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
-
+        InstitutionRequest institutionRequest =
         //when
 
         //서버 관리자가 신규 요양원을 등록한다.

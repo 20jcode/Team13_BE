@@ -21,6 +21,7 @@ public class Institution extends BaseEntity {
     @Column(unique = true)
     private String loginId;
 
+    @Column(nullable = false)
     private String loginPassword;
 
     @Column(nullable = false, unique = true)
