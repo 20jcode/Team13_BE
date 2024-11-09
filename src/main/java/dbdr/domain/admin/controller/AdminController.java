@@ -1,5 +1,6 @@
 package dbdr.domain.admin.controller;
 
+import dbdr.domain.admin.AdminCreateRequest;
 import dbdr.domain.admin.service.AdminService;
 import dbdr.security.model.AuthParam;
 import dbdr.security.model.DbdrAuth;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,5 +37,12 @@ public class AdminController {
     @DbdrAuth(targetRole = Role.ADMIN, authParam = AuthParam.ADMIN_ID,id = "#id")
     public ResponseEntity<String> getAdmin(@PathVariable(name = "id") Long id){
         return ResponseEntity.ok(adminService.getAdminById(id));
+    }
+
+    @Operation(summary = "서버관리자 추가")
+    @GetMapping("/add")
+    public ResponseEntity<Void> addAdmin(@RequestBody AdminCreateRequest adminCreateRequest){
+        adminService.addAdmin(adminCreateRequest);
+        return ResponseEntity.ok().build();
     }
 }

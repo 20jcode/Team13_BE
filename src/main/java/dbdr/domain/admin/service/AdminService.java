@@ -1,5 +1,6 @@
 package dbdr.domain.admin.service;
 
+import dbdr.domain.admin.AdminCreateRequest;
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.admin.repository.AdminRepository;
 import dbdr.global.exception.ApplicationException;
@@ -24,6 +25,15 @@ public class AdminService {
         log.info("관리자 존재 여부 확인 : {}",adminRepository.findAll().isEmpty());
         admin.changePassword(passwordEncoder.encode(admin.getLoginPassword()));
         adminRepository.save(admin);
+    }
+
+    @Transactional
+    public void addAdmin(AdminCreateRequest adminCreateRequest) {
+        Admin admin = Admin.builder()
+                .loginId(adminCreateRequest.loginId())
+                .loginPassword(adminCreateRequest.loginPassword())
+                .build();
+        addAdmin(admin);
     }
 
     @Transactional(readOnly = true)
