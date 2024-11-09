@@ -1,9 +1,12 @@
 package dbdr.security.model;
 
+import static dbdr.global.exception.ApplicationError.REFRESH_TOKEN_EXPIRED;
+import static dbdr.global.exception.ApplicationError.TOKEN_EXPIRED;
 import static dbdr.global.util.api.JwtUtils.ACCESS_TOKEN_EXPIRATION_TIME;
 import static dbdr.global.util.api.JwtUtils.REFRESH_TOKEN_EXPIRATION_TIME;
 import static dbdr.global.util.api.JwtUtils.TOKEN_PREFIX;
 
+import dbdr.global.exception.ApplicationException;
 import dbdr.global.util.api.JwtUtils;
 import dbdr.security.dto.TokenDTO;
 import dbdr.security.service.BaseUserDetailsService;
@@ -41,6 +44,7 @@ public class JwtProvider {
     public String extractToken(HttpServletRequest request) {
         log.info("request 토큰 추출 시작");
         String bearerToken = request.getHeader("Authorization");
+        log.info("request 토큰 값 : {}", bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(TOKEN_PREFIX)) {
             log.info("제거 전 request 토큰 값 : {}", bearerToken);
             bearerToken = bearerToken.substring(TOKEN_PREFIX.length());
@@ -89,7 +93,9 @@ public class JwtProvider {
     }
 
     private void validateBlackListToken(String token) {
-        if (redisService.isBlackList(getRedisCode(token), token)) {
+        if (!redisService.isBlackList(getRedisCode(token), token)) {
+            log.info("get redis code : {}", getRedisCode(token));
+            log.info("validate 실패");
             throw new ApplicationException(TOKEN_EXPIRED);
         }
 
@@ -98,6 +104,7 @@ public class JwtProvider {
     public TokenDTO renewTokens(String refreshToken) {
         if (!isValidRedisRefreshToken(getRedisCode(refreshToken), refreshToken)) {
             redisService.deleteRefreshToken(getRedisCode(refreshToken));
+            log.info("renew 실패");
             throw new ApplicationException(REFRESH_TOKEN_EXPIRED);
         }
 
