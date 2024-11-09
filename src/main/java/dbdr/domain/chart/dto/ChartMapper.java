@@ -7,6 +7,7 @@ import dbdr.domain.chart.dto.request.NursingManagementRequest;
 import dbdr.domain.chart.dto.request.RecoveryTrainingRequest;
 import dbdr.domain.chart.dto.response.BodyManagementResponse;
 import dbdr.domain.chart.dto.response.ChartDetailResponse;
+import dbdr.domain.chart.dto.response.ChartOverviewResponse;
 import dbdr.domain.chart.dto.response.CognitiveManagementResponse;
 import dbdr.domain.chart.dto.response.NursingManagementResponse;
 import dbdr.domain.chart.dto.response.RecoveryTrainingResponse;
@@ -41,6 +42,11 @@ public abstract class ChartMapper {
             @Mapping(target = "recipient", source = "recipientId")
     })
     public abstract Chart toEntity(ChartDetailRequest request);
+
+    @Mapping(target = "chartId", source = "id")
+    @Mapping(target = "recipientName", source = "recipient.name")
+    @Mapping(target = "chartDate", source = "createdAt")
+    public abstract ChartOverviewResponse toOverviewResponse(Chart chart);
 
     protected Recipient mapRecipient(Long recipientId) {
         return recipientService.findRecipientById(recipientId);

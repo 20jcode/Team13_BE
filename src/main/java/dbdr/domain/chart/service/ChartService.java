@@ -5,8 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dbdr.domain.chart.dto.ChartMapper;
 import dbdr.domain.chart.dto.request.ChartDetailRequest;
 import dbdr.domain.chart.dto.response.ChartDetailResponse;
+import dbdr.domain.chart.dto.response.ChartOverviewResponse;
 import dbdr.domain.chart.entity.Chart;
 import dbdr.domain.chart.repository.ChartRepository;
+import dbdr.global.exception.ApplicationError;
+import dbdr.global.exception.ApplicationException;
+import java.util.List;
+import java.util.stream.Collectors;
 import dbdr.global.configuration.OpenAiSummarizationConfig;
 import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
@@ -15,6 +20,7 @@ import dbdr.openai.dto.request.ChartDataRequest;
 import dbdr.openai.dto.request.OpenAiSummaryRequest;
 import dbdr.openai.dto.response.OpenAiSummaryResponse;
 import dbdr.openai.dto.response.SummaryResponse;
+import dbdr.openai.dto.response.TagResponse;
 import dbdr.openai.entity.Summary;
 import dbdr.openai.repository.SummaryRepository;
 import java.time.LocalDate;
@@ -51,13 +57,19 @@ public class ChartService {
     @Value("${openai.model}")
     private String modelOne;
 
-    public Page<ChartDetailResponse> getAllChartByRecipientId(Long recipientId, Pageable pageable) {
-        Page<Chart> results = chartRepository.findAllByRecipientId(recipientId, pageable);
-        return results.map(chartMapper::toResponse);
+    @Value("${openai.model-tag}")
+    private String modelTwo;
+
+    public List<ChartOverviewResponse> getAllChartByRecipientId(Long recipientId) {
+        List<Chart> results = chartRepository.findAllByRecipientId(recipientId);
+        return results.stream()
+                .map(chartMapper::toOverviewResponse)
+                .collect(Collectors.toList());
     }
 
     public ChartDetailResponse getChartById(Long chartId) {
-        Chart chart = chartRepository.findById(chartId).orElseThrow(); // 에러 처리 필요
+        Chart chart = chartRepository.findById(chartId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CHART_NOT_FOUND));
         return chartMapper.toResponse(chart);
     }
 
@@ -69,21 +81,48 @@ public class ChartService {
         Chart chart = chartMapper.toEntity(request);
         Chart savedChart = chartRepository.save(chart);
         SummaryResponse summaryResponse = getTextAndGetSummary(savedChart);
-        summaryRepository.save(new Summary(savedChart.getId(), summaryResponse.cognitiveManagement(),
-            summaryResponse.bodyManagement(), summaryResponse.recoveryTraining(),
-            summaryResponse.conditionDisease(), summaryResponse.nursingManagement()));
+        TagResponse tagResponse = getTag(summaryResponse);
+        summaryRepository.save(
+            new Summary(savedChart.getId(), summaryResponse.cognitiveManagement(),
+                summaryResponse.bodyManagement(), summaryResponse.recoveryTraining(),
+                summaryResponse.conditionDisease(), summaryResponse.nursingManagement(),
+                tagResponse.tag1(), tagResponse.tag2(), tagResponse.tag3()));
         return chartMapper.toResponse(savedChart);
     }
 
     public ChartDetailResponse updateChart(Long chartId, ChartDetailRequest request) {
-        Chart chart = chartRepository.findById(chartId).orElseThrow(); // 에러 처리 필요
+        Chart chart = chartRepository.findById(chartId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CHART_NOT_FOUND));
         chart.update(chartMapper.toEntity(request));
         Chart savedChart = chartRepository.save(chart);
         Summary summary = summaryRepository.findByChartId(chartId);
         SummaryResponse summaryResponse = getTextAndGetSummary(savedChart);
-        summary.update(summaryResponse);
+        TagResponse tagResponse = getTag(summaryResponse);
+        summary.update(summaryResponse.cognitiveManagement(), summaryResponse.bodyManagement(),
+            summaryResponse.recoveryTraining(), summaryResponse.conditionDisease(),
+            summaryResponse.nursingManagement(), tagResponse.tag1(), tagResponse.tag2(), tagResponse.tag3());
         summaryRepository.save(summary);
         return chartMapper.toResponse(savedChart);
+    }
+
+    private TagResponse getTag(SummaryResponse summaryResponse) {
+        String str = String.format(
+            "%s, %s, %s, %s, %s",
+            summaryResponse.cognitiveManagement(), summaryResponse.bodyManagement(),
+            summaryResponse.recoveryTraining(), summaryResponse.conditionDisease(),
+            summaryResponse.nursingManagement()
+        );
+        OpenAiSummaryResponse response = openAiResponse(str, modelTwo);
+        return parseTagString(response.choices().get(0).message().content());
+    }
+
+    private TagResponse parseTagString(String tagString) {
+        String[] tags = tagString.split(", ");
+        String tag1 = tags[0].split(": ")[1].trim();
+        String tag2 = tags[1].split(": ")[1].trim();
+        String tag3 = tags[2].split(": ")[1].trim();
+
+        return new TagResponse(tag1, tag2, tag3);
     }
 
     public OpenAiSummaryResponse openAiResponse(String str, String tempModel) {
@@ -180,7 +219,7 @@ public class ChartService {
         try {
             if (createdAt.length() >= 10) {
                 LocalDate date = LocalDate.parse(
-                    createdAt.substring(0, 10)); // Extract "YYYY-MM-DD"
+                    createdAt.substring(0, 10));
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM월 dd일");
                 return date.format(formatter);
             } else {

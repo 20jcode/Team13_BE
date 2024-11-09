@@ -12,10 +12,10 @@ public record BodyManagementRequest(
         @Schema(description = "섭취량", example = "3회")
         String intakeAmount, // 섭취량
         @Schema(description = "화장실 횟수", example = "6")
-        int physicalRestroom, // 화장실 횟수
+        String physicalRestroom, // 화장실 횟수
         @Schema(description = "산책", example = "false")
         boolean has_walked, // 산책
-        @Schema(description = "체위 변경 유므", example = "false")
+        @Schema(description = "체위 변경 유무", example = "false")
         boolean isPositionChangeRequired, // 체위 변경 유무
         @Schema(description = "이동 도움 유무", example = "false")
         boolean isMobilityAssistance, // 이동 도움 유무

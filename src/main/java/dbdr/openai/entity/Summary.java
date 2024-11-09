@@ -1,7 +1,6 @@
 package dbdr.openai.entity;
 
 import dbdr.domain.core.base.entity.BaseEntity;
-import dbdr.openai.dto.response.SummaryResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -28,12 +27,19 @@ public class Summary extends BaseEntity {
     String recoveryTraining;
     String conditionDisease;
     String nursingManagement;
+    String tagOne;
+    String tagTwo;
+    String tagThree;
 
-    public void update(SummaryResponse summaryResponse){
-        this.cognitiveManagement = summaryResponse.cognitiveManagement();
-        this.bodyManagement = summaryResponse.bodyManagement();
-        this.recoveryTraining = summaryResponse.recoveryTraining();
-        this.conditionDisease = summaryResponse.conditionDisease();
-        this.nursingManagement = summaryResponse.nursingManagement();
+    public void update(String cognitiveManagement, String bodyManagement, String recoveryTraining,
+        String conditionDisease, String nursingManagement, String tagOne, String tagTwo, String tagThree) {
+        this.cognitiveManagement =cognitiveManagement;
+        this.bodyManagement = bodyManagement;
+        this.recoveryTraining = recoveryTraining;
+        this.conditionDisease = conditionDisease;
+        this.nursingManagement = nursingManagement;
+        this.tagOne = tagOne;
+        this.tagTwo = tagTwo;
+        this.tagThree = tagThree;
     }
 }

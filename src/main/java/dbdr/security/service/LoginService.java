@@ -19,10 +19,10 @@ public class LoginService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    private final dbdr.security.service.JwtProvider jwtProvider;
+    private final dbdr.security.model.JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 
-    public LoginService(AuthenticationManagerBuilder authenticationManagerBuilder, dbdr.security.service.JwtProvider jwtProvider,
+    public LoginService(AuthenticationManagerBuilder authenticationManagerBuilder, dbdr.security.model.JwtProvider jwtProvider,
         PasswordEncoder passwordEncoder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.jwtProvider = jwtProvider;

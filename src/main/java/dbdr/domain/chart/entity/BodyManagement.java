@@ -27,7 +27,7 @@ public class BodyManagement extends BaseEntity {
     public PhysicalClear physicalClear; // 세면 및 목욕 체크박스
 
     @Comment("화장실 횟수")
-    private int physicalRestroom; // 화장실 횟수
+    private String physicalRestroom; // 화장실 횟수
 
     @Comment("특이사항")
     @Column(columnDefinition = "TEXT")
