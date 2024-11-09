@@ -1,5 +1,7 @@
 package dbdr.domain.careworker.service;
 
+import dbdr.domain.careworker.dto.request.CareworkerUpdateRequestDTO;
+import dbdr.domain.careworker.dto.response.CareworkerMyPageResponseDTO;
 import dbdr.domain.careworker.entity.Careworker;
 import dbdr.domain.careworker.dto.request.CareworkerRequest;
 import dbdr.domain.careworker.dto.response.CareworkerResponseDTO;
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +28,22 @@ public class CareworkerService {
 
     @Transactional(readOnly = true)
     public List<CareworkerResponseDTO> getCareworkersByInstitution(Long institutionId) {
-        return careworkerRepository.findByInstitutionId(institutionId).stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+        List<Careworker> results = careworkerRepository.findAllByInstitutionId(institutionId);
+        return results.stream().map(this::toResponseDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CareworkerResponseDTO getCareworkerByInstitution(Long careworkerId, Long institutionId) {
+        institutionService.getInstitutionById(institutionId);
+
+        Careworker careworker = careworkerRepository.findById(careworkerId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND));
+
+        if (!careworker.getInstitution().getId().equals(institutionId)) {
+            throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
+        }
+
+        return toResponseDTO(careworker);
     }
 
     @Transactional(readOnly = true)
@@ -43,6 +58,14 @@ public class CareworkerService {
         Careworker careworker = findCareworkerById(careworkerId);
         return toResponseDTO(careworker);
     }
+
+    @Transactional(readOnly = true)
+    public List<CareworkerResponseDTO> getAllCareworkers() {
+        List<Careworker> careworkers = careworkerRepository.findAll();
+        return careworkers.stream().map(this::toResponseDTO).toList();
+    }
+
+
 
     @Transactional
     public CareworkerResponseDTO addCareworker(CareworkerRequest careworkerRequest) {
@@ -66,6 +89,24 @@ public class CareworkerService {
     }
 
     @Transactional
+    public CareworkerResponseDTO updateCareworkerByAdmin(Long careworkerId, CareworkerRequestDTO careworkerDTO) {
+        Careworker careworker = findCareworkerById(careworkerId);
+
+
+        Institution institution = institutionService.getInstitutionById(careworkerDTO.getInstitutionId());
+        if (institution == null) {
+            throw new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND);
+        }
+
+        careworker.updateInstitution(institution);
+        careworker.updateCareworker(careworkerDTO);
+
+        return toResponseDTO(careworker);
+    }
+
+
+
+    @Transactional
     public void deleteCareworker(Long careworkerId, Long institutionId) {
         Careworker careworker = findCareworkerById(careworkerId);
 
@@ -76,6 +117,31 @@ public class CareworkerService {
         careworker.deactivate();
         careworkerRepository.delete(careworker);
     }
+
+    @Transactional
+    public void deleteCareworkerByAdmin(Long careworkerId) {
+        Careworker careworker = findCareworkerById(careworkerId);
+        careworker.deactivate();
+        careworkerRepository.delete(careworker);
+    }
+
+    @Transactional(readOnly = true)
+    public CareworkerMyPageResponseDTO getMyPageInfo(Long careworkerId) {
+        Careworker careworker = findCareworkerById(careworkerId);
+        return toMyPageResponseDTO(careworker);
+    }
+
+    @Transactional
+    public CareworkerMyPageResponseDTO updateWorkingDaysAndAlertTime(Long careworkerId, CareworkerUpdateRequestDTO request) {
+        Careworker careworker = careworkerRepository.findById(careworkerId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND));
+
+        careworker.updateWorkingDays(request.getWorkingDays());
+        careworker.updateAlertTime(request.getAlertTime());
+
+        return toMyPageResponseDTO(careworker);
+    }
+
 
     private Careworker findCareworkerById(Long careworkerId) {
         return careworkerRepository.findById(careworkerId)
@@ -105,5 +171,16 @@ public class CareworkerService {
 
     public Careworker findByPhone(String phoneNumber) {
         return careworkerRepository.findByPhone(phoneNumber).orElse(null);
+    }
+
+    private CareworkerMyPageResponseDTO toMyPageResponseDTO(Careworker careworker) {
+        return new CareworkerMyPageResponseDTO(
+                careworker.getName(),
+                careworker.getPhone(),
+                careworker.getInstitution().getInstitutionName(),
+                careworker.getLoginId(),
+                careworker.getWorkingDays(),
+                careworker.getAlertTime()
+        );
     }
 }
