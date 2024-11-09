@@ -1,6 +1,5 @@
 package dbdr.domain.careworker.dto.response;
 
-import dbdr.domain.institution.entity.Institution;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

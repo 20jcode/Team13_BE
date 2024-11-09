@@ -53,12 +53,18 @@ public class Guardian extends BaseEntity {
     public Guardian(String phone, String name) {
         this.phone = phone;
         this.name = name;
-        this.alertTime = LocalTime.of(9, 0); // 오전 9시로 초기화
+        this.alertTime = LocalTime.of(18, 0); // 오후 6시로 초기화
     }
 
     public void updateGuardian(String phone, String name) {
         this.phone = phone;
         this.name = name;
+    }
+
+    public void updateAlertTime(String name, String phone, LocalTime alertTime) {
+        this.phone = phone;
+        this.name = name;
+        this.alertTime = alertTime;
     }
 
     public void updateLineUserId(String lineUserId) {
