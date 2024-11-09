@@ -1,5 +1,6 @@
 package dbdr.domain.admin.controller;
 
+import dbdr.domain.admin.service.AdminService;
 import dbdr.security.model.AuthParam;
 import dbdr.security.model.DbdrAuth;
 import dbdr.security.model.Role;
@@ -12,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import dbdr.domain.admin.service.AdminService;
 
 @Tag(name = "[관리자] 서버관리자 (Admin)", description = "서버관리자 정보 조회, 수정")
 @RestController
@@ -26,7 +25,7 @@ public class AdminController {
 
     @Operation(summary = "서버관리자 정보 조회",security = @SecurityRequirement(name = "JWT"))
     @GetMapping
-    @DbdrAuth(targetRole = Role.ADMIN, authParam = AuthParam.ADMIN_ID)
+    @DbdrAuth(targetRole = Role.ADMIN)
     public ResponseEntity<List<String>> getAdminList(){
         return ResponseEntity.ok(adminService.getAllAdmins());
     }
