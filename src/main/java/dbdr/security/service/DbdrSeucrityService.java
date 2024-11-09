@@ -42,6 +42,18 @@ public class DbdrSeucrityService {
         if(authParam.equals(AuthParam.NONE) && id.isEmpty()){
             return dbdrAcess.hasRole(role,baseUserDetails);
         }
+        if(authParam.equals(AuthParam.LOGIN_INSTITUTION)){ //요양원으로 접근한 경우, 본인 요양원 정보만 접근해야함.
+            return dbdrAcess.hasAccessPermission(role,baseUserDetails,
+                findEntity(AuthParam.INSTITUTION_ID, baseUserDetails.getInstitutionId()));
+        }
+        if(authParam.equals(AuthParam.LOGIN_CAREWORKER)){ //요양사로 접근한 경우, 본인 요양사 정보만 접근해야함.
+            return dbdrAcess.hasAccessPermission(role,baseUserDetails,
+                findEntity(AuthParam.CAREWORKER_ID, baseUserDetails.getId()));
+        }
+        if(authParam.equals(AuthParam.LOGIN_GUARDIAN)){ //보호자로 접근한 경우, 본인 보호자 정보만 접근해야함.
+            return dbdrAcess.hasAccessPermission(role,baseUserDetails,
+                findEntity(AuthParam.GUARDIAN_ID, baseUserDetails.getId()));
+        }
         return dbdrAcess.hasAccessPermission(role,baseUserDetails, findEntity(authParam, Long.parseLong(id)));
 
     }
