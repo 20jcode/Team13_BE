@@ -1,9 +1,12 @@
 package dbdr.e2etest.Institution;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
-import dbdr.global.util.api.ApiUtils;
+import dbdr.domain.institution.dto.response.InstitutionResponse;
+import dbdr.global.util.api.ApiUtils.ApiResult;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
 import dbdr.testhelper.TestHelperFactory;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class InstitutionTest {
@@ -41,9 +45,14 @@ public class InstitutionTest {
         //서버 관리자가 신규 요양원을 등록한다.
         var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
             .uri("/admin/institution").requestBody(institutionRequest).post()
-                .toEntity(ApiUtils.ApiResult.class).getBody();
-        response.response().toString();
+                .toEntity(new ParameterizedTypeReference<ApiResult<InstitutionResponse>>() {}).getBody();
+
+
         //then
+
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().institutionName()).isEqualTo("김치덮밥요양원");
+        assertThat(response.response().institutionNumber()).isEqualTo(123123L);
     }
 /*
     @Test
