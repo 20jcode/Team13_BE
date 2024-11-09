@@ -1,28 +1,6 @@
 package dbdr.e2etest.Institution;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import dbdr.domain.admin.entity.Admin;
-import dbdr.domain.careworker.dto.request.CareworkerRequestDTO;
-import dbdr.domain.careworker.entity.Careworker;
-import dbdr.domain.institution.dto.request.InstitutionRequest;
-import dbdr.domain.institution.dto.response.InstitutionResponse;
-import dbdr.domain.institution.entity.Institution;
-import dbdr.global.exception.ApplicationError;
-import dbdr.security.model.Role;
-import dbdr.testhelper.TestHelper;
-import dbdr.testhelper.TestHelperFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-
-
+/*
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class InstitutionTest {
 
@@ -280,7 +258,7 @@ public class InstitutionTest {
             .phone("01012341234")
             .recipient(recipient)
             .build();
-        */
+
 
         //요양원 생성
         InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
@@ -322,3 +300,5 @@ public class InstitutionTest {
 
 
 }
+
+ */

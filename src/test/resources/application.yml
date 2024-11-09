@@ -1,21 +1,17 @@
 spring:
-  config:
-    test:
-      institution:
-        loginId: "testInstitution"
-        loginPassword: "passwordInstitution"
-        institutionNumber: "123"
-        institutionName: "돌다리요양원"
-  jwt:
-    secret: test
-    authheader: header
-  app:
-    version: v1
+    config:
+        import:
+        - optional:database.yml
+        - optional:logging.yml
+        - optional:application-secret.yml
 
-  data:
-    redis:
-      port: 1000
-      host: "host"
+    app:
+      version: v1
+
+    data:
+      redis:
+        port: 1000
+        host: "host"
 
 line:
   bot:
@@ -25,3 +21,4 @@ openai:
   api-key: "aaaaaa"
   model: "aa"
   chat-completions: "aaa"
+  model-tag: "aaa"
