@@ -46,8 +46,10 @@ public class InstitutionService {
 
     public InstitutionResponse addInstitution(InstitutionRequest institutionRequest) {
         ensureUniqueInstitutionNumber(institutionRequest.institutionNumber());
-        Institution institution = new Institution(institutionRequest.institutionNumber(),
-                institutionRequest.institutionName());
+        Institution institution = Institution.builder().loginId(institutionRequest.institutionLoginId())
+                .loginPassword(institutionRequest.institutionLoginPassword())
+                .institutionNumber(institutionRequest.institutionNumber())
+                .institutionName(institutionRequest.institutionName()).build();
         institution = institutionRepository.save(institution);
         return new InstitutionResponse(institution.getInstitutionNumber(),
                 institution.getInstitutionName());
