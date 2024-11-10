@@ -55,55 +55,56 @@ public class DbdrAcess {
         return false;
     }
 
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Institution institution) {
-        return userDetails.getInstitutionId().equals(institution.getId());
+    private boolean hasAccessPermission(BaseUserDetails loginUser, Institution targetInstitution) {
+        if(loginUser.isInstitution()){
+            return loginUser.getInstitutionId().equals(targetInstitution.getId());
+        }
+        return false;
     }
 
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Careworker careworker) {
-        if (userDetails.isInstitution()) {
-            return userDetails.getInstitutionId().equals(careworker.getInstitution().getId());
+    private boolean hasAccessPermission(BaseUserDetails loginUser, Careworker careworker) {
+        if (loginUser.isInstitution()) {
+            return loginUser.getInstitutionId().equals(careworker.getInstitution().getId());
         }
-        if (userDetails.isCareworker()) {
-            return userDetails.getId().equals(careworker.getId());
+        if (loginUser.isCareworker()) {
+            return loginUser.getId().equals(careworker.getId());
         }
         return false;
     }
 
 
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Guardian guardian) {
-        if (userDetails.isInstitution()) {
-            //return userDetails.getInstitutionId().equals(guardian.getRecipient().getInstitutionNumber());
-            return false;
+    private boolean hasAccessPermission(BaseUserDetails loginUser, Guardian guardian) {
+        if (loginUser.isInstitution()) {
+            return loginUser.getInstitutionId().equals(guardian.getInstitution().getId());
         }
-        if(userDetails.isGuardian()){
-            return userDetails.getId().equals(guardian.getId());
-        }
-        return false;
-    }
-
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Chart chart) {
-        if(userDetails.isInstitution()){
-            return userDetails.getInstitutionId().equals(chart.getRecipient().getInstitutionNumber());
-
-        }
-        if(userDetails.isCareworker()){
-            return userDetails.getId().equals(chart.getRecipient().getCareworker().getId());
-        }
-        if(userDetails.isGuardian()){
-            return userDetails.getId().equals(chart.getRecipient().getGuardian().getId());
+        if(loginUser.isGuardian()){
+            return loginUser.getId().equals(guardian.getId());
         }
         return false;
     }
 
-    private boolean hasAccessPermission(BaseUserDetails userDetails, Recipient recipient) {
-        if(userDetails.isAdmin()){
-            return userDetails.getInstitutionId().equals(recipient.getInstitutionNumber());
+    private boolean hasAccessPermission(BaseUserDetails loginUser, Chart chart) {
+        if(loginUser.isInstitution()){
+            return loginUser.getInstitutionId().equals(chart.getRecipient().getInstitutionNumber());
         }
-        if(userDetails.isCareworker()){
-            return userDetails.getId().equals(recipient.getCareworker().getId());
+        if(loginUser.isCareworker()){
+            return loginUser.getId().equals(chart.getRecipient().getCareworker().getId());
         }
-        if(userDetails.isGuardian()){
-            return userDetails.getId().equals(recipient.getGuardian().getId());
+        if(loginUser.isGuardian()){
+            return loginUser.getId().equals(chart.getRecipient().getGuardian().getId());
+        }
+        return false;
+    }
+
+    private boolean hasAccessPermission(BaseUserDetails loginUser, Recipient recipient) {
+        if(loginUser.isAdmin()){
+            return loginUser.getInstitutionId().equals(recipient.getInstitutionNumber());
+        }
+        if(loginUser.isCareworker()){
+            return loginUser.getId().equals(recipient.getCareworker().getId());
+        }
+        if(loginUser.isGuardian()){
+            return loginUser.getId().equals(recipient.getGuardian().getId());
         }
         return false;
     }

@@ -20,7 +20,7 @@ import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.entity.Institution;
 import dbdr.domain.institution.repository.InstitutionRepository;
 import dbdr.domain.institution.service.InstitutionService;
-import dbdr.domain.recipient.dto.request.RecipientRequestDTO;
+import dbdr.domain.recipient.dto.request.RecipientRequest;
 import dbdr.domain.recipient.entity.Recipient;
 import dbdr.domain.recipient.repository.RecipientRepository;
 import dbdr.domain.recipient.service.RecipientService;
@@ -87,7 +87,7 @@ public class TestHelperFactory {
     private List<GuardianRequest> guardians = new ArrayList<>();
     private List<CareworkerRequest> careworkers = new ArrayList<>();
     private List<InstitutionRequest> institutions = new ArrayList<>();
-    private List<RecipientRequestDTO> recipients = new ArrayList<>();
+    private List<RecipientRequest> recipients = new ArrayList<>();
     private List<Chart> charts = new ArrayList<>();
     private List<Admin> admins = new ArrayList<>();
 
@@ -144,8 +144,8 @@ public class TestHelperFactory {
     }
 
     public TestHelperFactory addRecipient(Recipient recipient) {
-        RecipientRequestDTO recipientRequestDTO = convertRecipient(recipient);
-        recipients.add(recipientRequestDTO);
+        RecipientRequest recipientRequest = convertRecipient(recipient);
+        recipients.add(recipientRequest);
         return this;
     }
 
@@ -177,8 +177,8 @@ public class TestHelperFactory {
                 institution.getLoginId(), institution.getLoginPassword());
     }
 
-    private RecipientRequestDTO convertRecipient(Recipient recipient) {
-        return new RecipientRequestDTO();
+    private RecipientRequest convertRecipient(Recipient recipient) {
+        return new RecipientRequest();
     }
 
 }

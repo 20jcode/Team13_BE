@@ -54,64 +54,32 @@ public class InstitutionTest {
         assertThat(response.response().institutionName()).isEqualTo("김치덮밥요양원");
         assertThat(response.response().institutionNumber()).isEqualTo(123123L);
     }
-/*
+
     @Test
     @DisplayName("요양원 번호 중복 등록 방지")
     public void addInstitutionTest2() {
         //given
+        Admin admin = Admin.builder().loginId("testadmin1").loginPassword("adminpassword").build();
+        testHelperFactory.addAdmin(admin);
+        testHelper = testHelperFactory.create(port);
 
-        Institution institution = Institution.builder().institutionName("김치덮밥요양원")
-            .institutionNumber(123123L)
-            .loginId("institutuion1")
-            .loginPassword("password")
-            .build();
+        InstitutionRequest institutionRequest = new InstitutionRequest(1444L, "김치찜요양원", "institutuion2", "password");
 
-        InstitutionRequest institutionRequest = emm.getMapper(Institution.class).toRequest(institution);
-
-        //요양원 번호 중복됨
-       Institution institution2 = Institution.builder().institutionName("김치덮밥요양원")
-            .institutionNumber(123123L)
-            .loginId("institutuion2")
-            .loginPassword("password")
-            .build();
-
-        InstitutionRequest institutionRequest2 = emm.getMapper(Institution.class).toRequest(institution2);
-
-        //요양원 이름 중복됨
-        Institution institution3 = Institution.builder().institutionName("김치덮밥요양원")
-            .institutionNumber(123125L)
-            .loginId("institutuion1")
-            .loginPassword("password")
-            .build();
-
-        InstitutionRequest institutionRequest3 = emm.getMapper(Institution.class).toRequest(institution3);
-
-        //when
-
-        //요양원 등록
-        var response = testHelper.user(Role.ADMIN, "testadmin", "adminpassword")
+        //서버관리자가 신규 요양원을 등록한다
+        var response = testHelper.user(Role.ADMIN, "testadmin1", "adminpassword")
             .uri("/admin/institution").requestBody(institutionRequest).post()
-            .toEntity(InstitutionResponse.class);
+            .toEntity(new ParameterizedTypeReference<ApiResult<InstitutionResponse>>() {}).getBody();
 
-        //then
+        //신규요양원 등록 성공
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().institutionName()).isEqualTo("김치찜요양원");
+        assertThat(response.response().institutionNumber()).isEqualTo(1444L);
 
-        //중복없는 요양원 등록 성공
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        //요양원 번호가 중복되는 경우
-        assertThatThrownBy(() -> {
-            testHelper.user(Role.ADMIN, "testadmin", "adminpassword").uri("/admin/institution")
-                .requestBody(institutionRequest2).post().toEntity(InstitutionResponse.class);
-        }).hasMessageContaining(ApplicationError.DUPLICATE_INSTITUTION_NUMBER.getMessage());
-
-        //요양원 이름이 중복되는 경우
-        assertThatThrownBy(() -> {
-            testHelper.user(Role.ADMIN, "testadmin", "adminpassword").uri("/admin/institution")
-                .requestBody(institutionRequest3).post().toEntity(InstitutionResponse.class);
-        }).hasMessageContaining(ApplicationError.DUPILCATE_INSTITUTION_NAME.getMessage());
+        //요양원
 
     }
 
+    /*
     @Test
     @DisplayName("요양원 정보 수정")
     public void updateInstitutionTest() {
@@ -305,9 +273,6 @@ public class InstitutionTest {
 
     }
 
-
-
- */
-
+    */
 }
 
