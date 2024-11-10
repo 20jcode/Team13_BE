@@ -13,6 +13,8 @@ import java.lang.annotation.Target;
  * id : 전달하고자하는 실제 값의 메소드 파라미터명<br>
  * authParam이 없는 경우 targetRole만 있으면 ok입니다.
  * <br>
+ * ex ) @DbdrAuth(targetRole = Role.Guardian, AuthParam = AuthParam.RECIPIENT_ID, id = "#recipientId")<br>
+ * <br>
  *
  * @see dbdr.security.service.DbdrSeucrityService
  * @see AuthParam
