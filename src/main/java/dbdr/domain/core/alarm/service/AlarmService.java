@@ -31,7 +31,7 @@ public class AlarmService {
 	public void createCareworkerAlarm(Careworker careworker) {
 		Alarm alarm = new Alarm(
 			LocalDateTime.now().with(LocalTime.of(17, 0)), // 오늘 17:00으로 설정
-			MessageTemplate.CAREWORKER_ALARM_MESSAGE.getTemplate(),
+			"MessageTemplate.CAREWORKER_ALARM_MESSAGE.getTemplate()",
 			careworker.getPhone(),
 			Role.CAREWORKER,
 			careworker.getId()
