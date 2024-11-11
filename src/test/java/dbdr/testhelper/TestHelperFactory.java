@@ -150,8 +150,7 @@ public class TestHelperFactory {
     }
 
     private GuardianRequest convertGuardian(Guardian guardian) {
-        return new GuardianRequest(guardian.getPhone(), guardian.getName(),
-                guardian.getLoginPassword());
+        throw new IllegalArgumentException("testfactory convertGuardian error");
     }
 
     private CareworkerRequest convertCareworker(Careworker careworker) {
