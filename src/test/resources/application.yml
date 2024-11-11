@@ -1,4 +1,10 @@
 spring:
+  config:
+    import:
+      - optional:database.yml
+      - optional:logging.yml
+      - optional:application-secret.yml
+      - optional:springdoc.yml
   jwt:
     secret: testasdfasdfasefasdcasfasefawefqwefqwefasdfwefqwdfaseffasdfa
     authheader: header
@@ -9,13 +15,3 @@ spring:
     redis:
       host: localhost
       port: 6379
-
-line:
-  bot:
-    channel-token: "TEST"
-
-openai:
-  api-key: "aaaaaa"
-  model: "aa"
-  chat-completions: "aaa"
-  model-tag: "aaa"

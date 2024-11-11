@@ -12,17 +12,13 @@ public class TestHelper {
 
     private RestClient restClient;
     private Integer port;
-    private Object user;
     private String authHeader;
-    private Map<String,String> queryParam = new HashMap<>();
     private Object requestBody;
     private String uri;
 
     private Role userRole;
     private String loginId;
     private String password;
-
-    //TestHelper.port(port).user(Object obj).get//post//put//delete -> return ResponseEntity
 
     public TestHelper(int port,RestClient restClient){
         this.port = port;
@@ -35,6 +31,15 @@ public class TestHelper {
         this.password = password;
         return this;
     }
+
+    public TestHelper useAdmin(){
+        this.userRole = Role.ADMIN;
+        this.loginId = "admin";
+        this.password = "admin";
+        return this;
+    }
+
+
     public TestHelper uri(String uri){
         this.uri = uri;
         return this;

@@ -150,8 +150,7 @@ public class TestHelperFactory {
     }
 
     private GuardianRequest convertGuardian(Guardian guardian) {
-        return new GuardianRequest(guardian.getPhone(), guardian.getName(),
-                guardian.getLoginPassword());
+        return new GuardianRequest(guardian.getPhone(), guardian.getName(),guardian.getLoginPassword() , guardian.getInstitution().getId());
     }
 
     private CareworkerRequest convertCareworker(Careworker careworker) {
