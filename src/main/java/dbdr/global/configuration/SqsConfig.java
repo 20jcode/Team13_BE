@@ -10,6 +10,7 @@ import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import io.awspring.cloud.sqs.listener.acknowledgement.AcknowledgementOrdering;
 import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
+import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
@@ -28,6 +29,7 @@ public class SqsConfig {
 
 	// 클라이언트 설정: region과 자격증명
 	@Bean
+	@Profile("!test")
 	public SqsAsyncClient sqsAsyncClient() {
 		return SqsAsyncClient.builder()
 			.credentialsProvider(() -> new AwsCredentials() {
@@ -47,6 +49,7 @@ public class SqsConfig {
 
 	// Listener Factory 설정 (Listener 쪽)
 	@Bean
+	@Profile("!test")
 	SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
 		return SqsMessageListenerContainerFactory
 			.builder()
@@ -62,6 +65,7 @@ public class SqsConfig {
 
 	// 메시지 발송을 위한 SQS 템플릿 설정 (Sender 쪽)
 	@Bean
+	@Profile("!test")
 	public SqsTemplate sqsTemplate() {
 		return SqsTemplate.newTemplate(sqsAsyncClient());
 	}

@@ -1,0 +1,9 @@
+spring:
+  config:
+    import:
+      - optional:database-test.yml
+      - optional:logging-test.yml
+      - optional:application-secret.yml
+      - optional:springdoc-test.yml
+  app:
+    version: v1

@@ -8,12 +8,14 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 // 스웨거 설정
 @Configuration
 public class OpenApiConfiguration {
 
     @Bean
+    @Profile("!test")
     public OpenAPI openAPI() {
         String jwt = "JWT";
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwt);
@@ -37,6 +39,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi allApi() {
         return GroupedOpenApi.builder()
             .group("1.all")
@@ -46,6 +49,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi institutionApi() {
         return GroupedOpenApi.builder()
             .group("institution")
@@ -55,6 +59,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
             .group("admin")
@@ -64,6 +69,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi guardianApi() {
         return GroupedOpenApi.builder()
             .group("guardian")
@@ -73,6 +79,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi careworkerApi() {
         return GroupedOpenApi.builder()
             .group("careworker")
@@ -82,6 +89,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi chartApi() {
         return GroupedOpenApi.builder()
             .group("chart")
@@ -91,6 +99,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi excelApi() {
         return GroupedOpenApi.builder()
             .group("excel")
@@ -100,6 +109,7 @@ public class OpenApiConfiguration {
     }
 
     @Bean
+    @Profile("!test")
     public GroupedOpenApi authentication() {
         return GroupedOpenApi.builder()
             .group("authentication")

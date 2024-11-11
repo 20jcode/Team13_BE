@@ -5,6 +5,7 @@ import dbdr.security.dto.TokenDTO;
 import dbdr.security.model.Role;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
@@ -20,9 +21,11 @@ public class TestHelper {
     private String loginId;
     private String password;
 
-    public TestHelper(int port,RestClient restClient){
+    public TestHelper(int port){
         this.port = port;
-        this.restClient = restClient;
+        this.restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/v1")
+                .defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .build();
     }
 
     public TestHelper user(Role userRole,String loginId,String password){

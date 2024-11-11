@@ -8,12 +8,14 @@ import dbdr.global.exception.ApplicationError;
 import dbdr.global.exception.ApplicationException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InstitutionService {
 
     private final InstitutionRepository institutionRepository;
@@ -22,8 +24,11 @@ public class InstitutionService {
     PasswordEncoder passwordEncoder;
 
     public Institution getInstitutionById(Long id) {
-        return institutionRepository.findById(id)
+        log.info("InstitutionService.getInstitutionById : {}", id);
+        Institution institution = institutionRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND));
+        log.info("InstitutionService.getInstitutionById : {}, name : {}", institution.getId(), institution.getInstitutionName());
+        return institution;
     }
 
     public InstitutionResponse getInstitutionResponseById(Long id) {

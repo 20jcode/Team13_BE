@@ -18,7 +18,7 @@ public enum MessageTemplate {
 	}
 
 	public String getTemplate() {
-		return template;
+		return "abcd";
 	}
 
 	public String format(Object... args) {

@@ -9,6 +9,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class S3Config {
@@ -21,12 +22,14 @@ public class S3Config {
 
 	@Bean
 	@Primary
+	@Profile("!test")
 	public BasicAWSCredentials awsCredentialsProvider(){
 		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
 		return basicAWSCredentials;
 	}
 
 	@Bean
+    @Profile("!test")
 	public AmazonS3 amazonS3() {
 		AmazonS3 s3Builder = AmazonS3ClientBuilder.standard()
 			.withRegion(region)

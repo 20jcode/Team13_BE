@@ -9,10 +9,8 @@ import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.global.util.api.ApiUtils.ApiResult;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
-import dbdr.testhelper.TestHelperFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -24,9 +22,6 @@ public class InstitutionTest {
     @LocalServerPort
     private int port;
 
-    @Autowired
-    TestHelperFactory testHelperFactory;
-
     TestHelper testHelper;
 
 
@@ -36,8 +31,6 @@ public class InstitutionTest {
 
         //given
         Admin admin = Admin.builder().loginId("testadmin").loginPassword("adminpassword").build();
-        testHelperFactory.addAdmin(admin);
-        testHelper = testHelperFactory.create(port);
 
         InstitutionRequest institutionRequest = new InstitutionRequest(123123L, "김치덮밥요양원", "institutuion1", "password");
         //when
