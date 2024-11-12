@@ -87,10 +87,6 @@ public class CareworkerService {
         ensureUniqueEmailButNotId(request.getEmail(), careworkerId);
         Careworker careworker = findCareworkerById(careworkerId);
 
-        /*if (!careworker.getInstitution().equals(institution)) {
-            throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
-        }*/
-
         careworker.updateCareworker(careworkerMapper.toEntity(request));
         return careworkerMapper.toResponse(careworker);
     }
