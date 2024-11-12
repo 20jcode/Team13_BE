@@ -50,11 +50,8 @@ public class DbdrSeucrityService {
             throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
         }
 
-        try {
-            Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            log.error("권한검사 에러 : id가 숫자가 아닙니다.");
-            throw new ApplicationException(ApplicationError.ILLIGAL_ARGUMENT);
+        if (authParam.equals(AuthParam.NONE)) {
+            return dbdrAcess.hasRole(role, baseUserDetails);
         }
 
         if(authParam.equals(AuthParam.LOGIN_INSTITUTION)){ //요양원으로 접근한 경우, 본인 요양원 정보만 접근해야함.
