@@ -3,8 +3,7 @@ package dbdr.testhelper;
 import dbdr.security.dto.LoginRequest;
 import dbdr.security.dto.TokenDTO;
 import dbdr.security.model.Role;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec;
 
@@ -12,9 +11,7 @@ public class TestHelper {
 
     private RestClient restClient;
     private Integer port;
-    private Object user;
     private String authHeader;
-    private Map<String,String> queryParam = new HashMap<>();
     private Object requestBody;
     private String uri;
 
@@ -22,11 +19,11 @@ public class TestHelper {
     private String loginId;
     private String password;
 
-    //TestHelper.port(port).user(Object obj).get//post//put//delete -> return ResponseEntity
-
-    public TestHelper(int port,RestClient restClient){
+    public TestHelper(int port){
         this.port = port;
-        this.restClient = restClient;
+        this.restClient = RestClient.builder().baseUrl("http://localhost:" + port + "/v1")
+                .defaultHeaders(headers -> headers.setContentType(MediaType.APPLICATION_JSON))
+                .build();
     }
 
     public TestHelper user(Role userRole,String loginId,String password){
