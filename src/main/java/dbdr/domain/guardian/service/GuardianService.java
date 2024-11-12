@@ -2,6 +2,7 @@ package dbdr.domain.guardian.service;
 
 import dbdr.domain.core.alarm.service.AlarmService;
 import dbdr.domain.guardian.dto.request.GuardianAlertTimeRequest;
+import dbdr.domain.guardian.dto.request.GuardianUpdateRequest;
 import dbdr.domain.guardian.dto.response.GuardianMyPageResponse;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.guardian.dto.request.GuardianRequest;
@@ -35,7 +36,7 @@ public class GuardianService {
     public GuardianResponse getGuardianById(Long guardianId) {
         Guardian guardian = findGuardianById(guardianId);
         return new GuardianResponse(guardianId, guardian.getPhone(), guardian.getName(),
-            guardian.isActive());
+            guardian.getInstitution().getId(), guardian.isActive());
     }
 
     public GuardianMyPageResponse getMyPageGuardianInfo(Long guardianId) {
@@ -57,7 +58,7 @@ public class GuardianService {
     @Transactional
     public GuardianResponse updateGuardianById(
         Long guardianId,
-        GuardianRequest guardianRequest
+        GuardianUpdateRequest guardianRequest
     ) {
         ensureUniquePhoneButNotId(guardianRequest.phone(), guardianId);
 
@@ -65,6 +66,7 @@ public class GuardianService {
         guardian.updateGuardian(guardianRequest.phone(), guardianRequest.name());
         guardianRepository.save(guardian);
         return new GuardianResponse(guardianId, guardianRequest.phone(), guardianRequest.name(),
+            guardian.getInstitution().getId(),
             guardian.isActive());
     }
 
@@ -74,6 +76,7 @@ public class GuardianService {
         return guardianList.stream()
             .map(guardian -> new GuardianResponse(guardian.getId(), guardian.getPhone(),
                 guardian.getName(),
+                guardian.getInstitution().getId(),
                 guardian.isActive()))
             .toList();
     }
@@ -93,7 +96,8 @@ public class GuardianService {
             .build();
         guardian = guardianRepository.save(guardian);
         alarmService.createGuardianAlarm(guardian);
-        return new GuardianResponse(guardian.getId(), guardian.getPhone(), guardian.getName(), guardian.isActive());
+        return new GuardianResponse(guardian.getId(), guardian.getPhone(), guardian.getName(),
+            guardian.getInstitution().getId(), guardian.isActive());
     }
 
     @Transactional

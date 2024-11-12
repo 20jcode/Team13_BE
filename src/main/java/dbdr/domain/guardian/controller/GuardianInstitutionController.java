@@ -1,6 +1,7 @@
 package dbdr.domain.guardian.controller;
 
 import dbdr.domain.guardian.dto.request.GuardianRequest;
+import dbdr.domain.guardian.dto.request.GuardianUpdateRequest;
 import dbdr.domain.guardian.dto.response.GuardianResponse;
 import dbdr.domain.guardian.service.GuardianService;
 import dbdr.global.util.api.ApiUtils;
@@ -55,7 +56,7 @@ public class GuardianInstitutionController {
     @PutMapping("/{guardianId}")
     public ResponseEntity<ApiUtils.ApiResult<GuardianResponse>> updateGuardian(
         @PathVariable("guardianId") Long guardianId,
-        @Valid @RequestBody GuardianRequest guardianRequest) {
+        @Valid @RequestBody GuardianUpdateRequest guardianRequest) {
         GuardianResponse guardianResponse = guardianService.updateGuardianById(guardianId,
             guardianRequest);
         return ResponseEntity.ok(ApiUtils.success(guardianResponse));
