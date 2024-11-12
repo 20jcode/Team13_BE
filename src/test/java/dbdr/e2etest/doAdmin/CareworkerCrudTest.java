@@ -2,6 +2,7 @@ package dbdr.e2etest.doAdmin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.admin.service.AdminService;
@@ -12,6 +13,7 @@ import dbdr.domain.institution.dto.response.InstitutionResponse;
 import dbdr.global.util.api.ApiUtils.ApiResult;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -261,6 +263,251 @@ public class CareworkerCrudTest {
         });
 
          */
+
+    }
+
+    @Test
+    @DisplayName("서버관리자가 요양보호사의 요양원을 변경할 수 없다. : 주석처리됨")
+    void test_b3() {
+        /* 추가 수정 필요
+        //init
+        String adminId = "admin_b3";
+        String adminpassword = "admin_b3";
+        addAdmin(adminId, adminpassword);
+
+        String testNumber = "3";
+        Long institutionId = addInstitutionRequestLogic(adminId, adminpassword, testNumber);
+
+        TestHelper testHelper = new TestHelper(port);
+
+        //given : 수정 전 요양보호사 정보
+        String beforeUri = "/admin/careworker";
+
+        String careworkerPhone = "01032121162";
+        String careworkerName = "careworker_b3";
+        String careworkerEmail = "b3@b3.com";
+        String careworkerLoginPassword = "careworker_b3";
+
+        CareworkerRequest careworkerRequest = new CareworkerRequest(institutionId, careworkerName,
+            careworkerEmail, careworkerPhone, careworkerLoginPassword);
+
+        //when : 요양보호사를 먼저 등록한다.
+
+        var response = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri(beforeUri)
+            .requestBody(careworkerRequest)
+            .post()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            })
+            .getBody();
+
+        //then
+
+        assertThat(response).isNotNull();
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().getEmail()).isEqualTo(careworkerEmail);
+        assertThat(response.response().getName()).isEqualTo(careworkerName);
+        assertThat(response.response().getPhone()).isEqualTo(careworkerPhone);
+        assertThat(response.response().getInstitutionId()).isEqualTo(institutionId);
+
+        //given : 수정 후 요양보호사 정보
+
+        //변경대상 institution
+        Long changeInstitutionId = addInstitutionRequestLogic(adminId, adminpassword, "9999333");
+
+        CareworkerRequest careworkerChangePasswordRequest = new CareworkerRequest(changeInstitutionId,
+            careworkerName, careworkerEmail, careworkerPhone, careworkerLoginPassword);
+
+        // 요양보호사를 수정하고자 할 떄, institutionId를 변경하여 요청한다.
+        assertThatThrownBy(() -> {
+            testHelper.user(Role.ADMIN, adminId, adminpassword)
+                .uri("/admin/careworker/" + response.response().getId())
+                .requestBody(careworkerChangePasswordRequest) //insitutionId가 변경되어 들어간다.
+                .put()
+                .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+                })
+                .getBody();
+        }).isInstanceOf(Exception.class);
+
+
+         */
+    }
+
+    @Test
+    @DisplayName("서버관리자가 요양보호사를 삭제한다.")
+    void test_b4() {
+        //init
+        String adminId = "admin_b4";
+        String adminpassword = "admin_b4";
+        addAdmin(adminId, adminpassword);
+
+        String testNumber = "4";
+        Long institutionId = addInstitutionRequestLogic(adminId, adminpassword, testNumber);
+
+        TestHelper testHelper = new TestHelper(port);
+
+        //given : 삭제할 요양보호사 정보
+        String beforeUri = "/admin/careworker";
+
+        String careworkerPhone = "01032121162";
+        String careworkerName = "careworker_b4";
+        String careworkerEmail = "b4@b4.com";
+        String careworkerLoginPassword = "careworker_b4";
+
+        CareworkerRequest careworkerRequest = new CareworkerRequest(institutionId, careworkerName,
+            careworkerEmail, careworkerPhone, careworkerLoginPassword);
+
+        //when : 요양보호사를 등록한다
+        var response = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri(beforeUri)
+            .requestBody(careworkerRequest)
+            .post()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            })
+            .getBody();
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().getEmail()).isEqualTo(careworkerEmail);
+        assertThat(response.response().getName()).isEqualTo(careworkerName);
+        assertThat(response.response().getPhone()).isEqualTo(careworkerPhone);
+        assertThat(response.response().getInstitutionId()).isEqualTo(institutionId);
+
+        //when : 요양보호사를 삭제한다.
+        var responseDelete = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri("/admin/careworker/" + response.response().getId())
+            .delete()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            });
+
+        //then
+        assertThat(responseDelete.getStatusCode().is2xxSuccessful()).isTrue();
+
+        //삭제된 요양보호사를 조회한다.
+        assertThatThrownBy(() -> {
+            testHelper.user(Role.ADMIN, adminId, adminpassword)
+                .uri("/admin/careworker/" + response.response().getId())
+                .get()
+                .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+                })
+                .getBody();
+        }).isInstanceOf(Exception.class);
+
+    }
+
+    @Test
+    @DisplayName("서버관리자가 요양보호사를 조회한다.")
+    void test_b5() {
+        //init
+        String adminId = "admin_b5";
+        String adminpassword = "admin_b5";
+        addAdmin(adminId, adminpassword);
+
+        String testNumber = "5";
+        Long institutionId = addInstitutionRequestLogic(adminId, adminpassword, testNumber);
+
+        TestHelper testHelper = new TestHelper(port);
+
+        //given : 조회할 요양보호사 정보
+        String beforeUri = "/admin/careworker";
+
+        String careworkerPhone = "01032121162";
+        String careworkerName = "careworker_b5";
+        String careworkerEmail = "b5@b5.com";
+        String careworkerLoginPassword = "careworker_b5";
+
+        CareworkerRequest careworkerRequest = new CareworkerRequest(institutionId, careworkerName,
+            careworkerEmail, careworkerPhone, careworkerLoginPassword);
+
+        //when : 요양보호사를 등록한다
+        var response = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri(beforeUri)
+            .requestBody(careworkerRequest)
+            .post()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            })
+            .getBody();
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().getEmail()).isEqualTo(careworkerEmail);
+        assertThat(response.response().getName()).isEqualTo(careworkerName);
+        assertThat(response.response().getPhone()).isEqualTo(careworkerPhone);
+        assertThat(response.response().getInstitutionId()).isEqualTo(institutionId);
+
+        //when : 요양보호사를 조회한다.
+        var responseGet = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri("/admin/careworker/" + response.response().getId())
+            .get()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            })
+            .getBody();
+
+        //then
+        assertThat(responseGet).isNotNull();
+        assertThat(responseGet.success()).isTrue();
+        assertThat(responseGet.response().getEmail()).isEqualTo(careworkerEmail);
+        assertThat(responseGet.response().getName()).isEqualTo(careworkerName);
+        assertThat(responseGet.response().getPhone()).isEqualTo(careworkerPhone);
+        assertThat(responseGet.response().getInstitutionId()).isEqualTo(institutionId);
+    }
+
+    @Test
+    @DisplayName("서버관리자가 여러 요양원에 소속된 모든 요양보호사를 조회한다.")
+    void test_b6() {
+        //init
+        String adminId = "admin_b6";
+        String adminpassword = "admin_b6";
+        addAdmin(adminId, adminpassword);
+
+        String testNumber = "6";
+        Long institutionId = addInstitutionRequestLogic(adminId, adminpassword, testNumber);
+
+        TestHelper testHelper = new TestHelper(port);
+
+        //given : 조회할 요양보호사 정보
+        String beforeUri = "/admin/careworker";
+
+        String careworkerPhone = "01032323262";
+        String careworkerName = "careworker_b6";
+        String careworkerEmail = "b6@b6.com";
+        String careworkerLoginPassword = "careworker_b6";
+
+        CareworkerRequest careworkerRequest = new CareworkerRequest(institutionId, careworkerName,
+            careworkerEmail, careworkerPhone, careworkerLoginPassword);
+
+        //when : 요양보호사를 등록한다
+        var response = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri(beforeUri)
+            .requestBody(careworkerRequest)
+            .post()
+            .toEntity(new ParameterizedTypeReference<ApiResult<CareworkerResponse>>() {
+            })
+            .getBody();
+
+        //then
+        assertThat(response).isNotNull();
+        assertThat(response.success()).isTrue();
+        assertThat(response.response().getEmail()).isEqualTo(careworkerEmail);
+        assertThat(response.response().getName()).isEqualTo(careworkerName);
+        assertThat(response.response().getPhone()).isEqualTo(careworkerPhone);
+        assertThat(response.response().getInstitutionId()).isEqualTo(institutionId);
+
+        //when : 여러 요양원에 소속된 모든 요양보호사를 조회한다.
+        var responseGet = testHelper.user(Role.ADMIN, adminId, adminpassword)
+            .uri("/admin/careworker")
+            .get()
+            .toEntity(new ParameterizedTypeReference<ApiResult<List<CareworkerResponse>>>() {
+            })
+            .getBody();
+
+        assertThat(responseGet).isNotNull();
+        assertThat(responseGet.success()).isTrue();
+        assertThat(responseGet.response().size()).isGreaterThan(0);
+        assertThat(responseGet.response().stream().anyMatch(
+            careworkerResponse -> careworkerResponse.getEmail().equals(careworkerEmail))).isTrue();
 
     }
 }
