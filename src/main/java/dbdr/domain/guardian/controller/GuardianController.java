@@ -5,6 +5,9 @@ import dbdr.domain.guardian.dto.response.GuardianMyPageResponse;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.guardian.service.GuardianService;
 import dbdr.global.util.api.ApiUtils;
+import dbdr.security.model.AuthParam;
+import dbdr.security.model.DbdrAuth;
+import dbdr.security.model.Role;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -31,6 +34,7 @@ public class GuardianController {
 
     @Operation(summary = "보호자 본인의 정보 조회", security = @SecurityRequirement(name = "JWT"))
     @GetMapping
+    @DbdrAuth(targetRole = Role.GUARDIAN, authParam = AuthParam.LOGIN_GUARDIAN)
     public ResponseEntity<ApiUtils.ApiResult<GuardianMyPageResponse>> showGuardianInfo(
         @Parameter(hidden = true) @LoginGuardian Guardian guardian) {
         log.info("guardianId: {}", guardian.getName());
@@ -41,6 +45,7 @@ public class GuardianController {
 
     @Operation(summary = "보호자 본인의 정보 수정", security = @SecurityRequirement(name = "JWT"))
     @PutMapping
+    @DbdrAuth(targetRole = Role.GUARDIAN, authParam = AuthParam.LOGIN_GUARDIAN)
     public ResponseEntity<ApiUtils.ApiResult<GuardianMyPageResponse>> updateGuardianInfo(
         @Valid @RequestBody GuardianAlertTimeRequest guardianAlertTimeRequest,
         @Parameter(hidden = true) @LoginGuardian Guardian guardian) {

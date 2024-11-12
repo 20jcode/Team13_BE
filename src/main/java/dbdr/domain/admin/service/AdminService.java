@@ -22,7 +22,6 @@ public class AdminService {
 
     @Transactional
     public void addAdmin(Admin admin) {
-        log.info("관리자 존재 여부 확인 : {}",adminRepository.findAll().isEmpty());
         admin.changePassword(passwordEncoder.encode(admin.getLoginPassword()));
         adminRepository.save(admin);
     }
