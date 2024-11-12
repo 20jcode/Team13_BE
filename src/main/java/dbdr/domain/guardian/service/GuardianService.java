@@ -1,6 +1,7 @@
 package dbdr.domain.guardian.service;
 
 import dbdr.domain.core.alarm.service.AlarmService;
+import dbdr.domain.core.alarm.service.AlarmService;
 import dbdr.domain.guardian.dto.request.GuardianAlertTimeRequest;
 import dbdr.domain.guardian.dto.request.GuardianUpdateRequest;
 import dbdr.domain.guardian.dto.response.GuardianMyPageResponse;
@@ -45,12 +46,14 @@ public class GuardianService {
             guardian.getAlertTime());
     }
 
+    @Transactional
     public GuardianMyPageResponse updateAlertTime(Long guardianId,
         GuardianAlertTimeRequest request) {
         ensureUniquePhoneButNotId(request.phone(), guardianId);
         Guardian guardian = findGuardianById(guardianId);
         guardian.updateAlertTime(request.name(), request.phone(), request.alertTime());
         guardianRepository.save(guardian);
+        alarmService.updateAlarmByLocalTime(request.alertTime(), request.phone());
         return new GuardianMyPageResponse(guardian.getName(), guardian.getPhone(),
             guardian.getAlertTime());
     }

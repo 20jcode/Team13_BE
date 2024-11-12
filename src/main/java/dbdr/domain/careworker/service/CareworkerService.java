@@ -2,8 +2,6 @@ package dbdr.domain.careworker.service;
 
 import dbdr.domain.careworker.dto.CareworkerMapper;
 import dbdr.domain.careworker.dto.request.CareworkerRequest;
-import dbdr.domain.careworker.dto.request.CareworkerUpdateAdminRequest;
-import dbdr.domain.careworker.dto.request.CareworkerUpdateInstitutionRequest;
 import dbdr.domain.careworker.dto.request.CareworkerUpdateRequest;
 import dbdr.domain.careworker.dto.response.CareworkerMyPageResponse;
 import dbdr.domain.careworker.dto.response.CareworkerResponse;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -88,32 +87,28 @@ public class CareworkerService {
         ensureUniqueEmailButNotId(request.getEmail(), careworkerId);
         Careworker careworker = findCareworkerById(careworkerId);
 
+        /*if (!careworker.getInstitution().equals(institution)) {
+            throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
+        }*/
+
         careworker.updateCareworker(careworkerMapper.toEntity(request));
         return careworkerMapper.toResponse(careworker);
     }
 
     @Transactional
-    public CareworkerResponse updateCareworkerByAdmin(Long careworkerId, CareworkerUpdateAdminRequest request) {
-
-        Careworker careworker = findCareworkerById(careworkerId);
-
-        Institution institution = institutionService.getInstitutionById(request.getInstitutionId());
-
-        careworker.updateInstitution(institution);
-        careworker.updateCareworker(toEntity(request));
-
-        return careworkerMapper.toResponse(careworker);
-    }
-
-    // 요양원용 업데이트
-    @Transactional
-    public CareworkerResponse updateCareworkerByInstitution(Long careworkerId, CareworkerUpdateInstitutionRequest request) {
+    public CareworkerResponse updateCareworkerByAdmin(Long careworkerId, CareworkerRequest request) {
         ensureUniquePhoneButNotId(request.getPhone(), careworkerId);
         ensureUniqueEmailButNotId(request.getEmail(), careworkerId);
         Careworker careworker = findCareworkerById(careworkerId);
 
+        Institution institution = institutionService.getInstitutionById(request.getInstitutionId());
+        /*if (institution == null) {
+            throw new ApplicationException(ApplicationError.INSTITUTION_NOT_FOUND);
+        }*/
 
-        careworker.updateCareworker(toEntity(request, careworker));
+        careworker.updateInstitution(institution);
+        careworker.updateCareworker(careworkerMapper.toEntity(request));
+
         return careworkerMapper.toResponse(careworker);
     }
 
@@ -147,6 +142,7 @@ public class CareworkerService {
 
         careworker.updateWorkingDays(request.getWorkingDays());
         careworker.updateAlertTime(request.getAlertTime());
+        alarmService.updateAlarmByLocalTime(request.getAlertTime(), careworker.getPhone());
 
         return toMyPageResponseDTO(careworker);
     }
@@ -194,6 +190,15 @@ public class CareworkerService {
         return careworkerRepository.findByPhone(phoneNumber).orElse(null);
     }
 
+    @Transactional
+    public void updateLineUserId(String userId, String phoneNumber) {
+        Careworker careworker = findByPhone(phoneNumber);
+        careworker.updateLineUserId(userId);
+        careworkerRepository.save(careworker);
+    }
+
+
+
     private CareworkerMyPageResponse toMyPageResponseDTO(Careworker careworker) {
         return new CareworkerMyPageResponse(
                 careworker.getName(),
@@ -203,35 +208,4 @@ public class CareworkerService {
                 careworker.getWorkingDays()
         );
     }
-
-    public Careworker toEntity(CareworkerUpdateAdminRequest request) {
-        Institution institution = institutionService.getInstitutionById(request.getInstitutionId());
-        return Careworker.builder()
-                .institution(institution)
-                .name(request.getName())
-                .email(request.getEmail())
-                .phone(request.getPhone())
-                .build();
-    }
-
-    // 요양원 요청을 Careworker 엔티티로 변환하는 메서드 (institutionId 수정 없음)
-    public Careworker toEntity(CareworkerUpdateInstitutionRequest request, Careworker existingCareworker) {
-        existingCareworker.updateCareworker(
-                Careworker.builder()
-                        .name(request.getName())
-                        .email(request.getEmail())
-                        .phone(request.getPhone())
-                        .build()
-        );
-        return existingCareworker;
-    }
-
-    @Transactional
-    public void updateLineUserId(String userId, String phoneNumber) {
-        Careworker careworker = findByPhone(phoneNumber);
-        careworker.updateLineUserId(userId);
-        careworkerRepository.save(careworker);
-    }
-
-
 }
