@@ -50,7 +50,7 @@ public class CareworkerCrudTest {
      */
     private Long addInstitutionRequestLogic(String adminId, String adminpassword,
         String testNumber) {
-        Long institutionNumber = 1000L + Long.parseLong(testNumber) * 100;
+        Long institutionNumber = 2000L + Long.parseLong(testNumber) * 100;
         String institutionName = "institution_b" + testNumber;
         String institutionLoginId = "institution_b" + testNumber;
         String institutionLoginPassword = "institution_b" + testNumber;
