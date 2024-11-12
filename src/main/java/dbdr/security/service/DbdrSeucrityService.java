@@ -37,11 +37,26 @@ public class DbdrSeucrityService {
 
     public boolean hasAcesssPermission(@NotNull Role role, @NotNull AuthParam authParam,String id) {
         log.info("권한확인 메소드 동작 시작 : role : {}, authParam : {}, id : {}", role, authParam, id);
-        BaseUserDetails baseUserDetails = (BaseUserDetails) SecurityContextHolder.getContext()
+
+        BaseUserDetails baseUserDetails;
+
+        Object principal = SecurityContextHolder.getContext()
             .getAuthentication().getPrincipal();
-        if(authParam.equals(AuthParam.NONE) && id.isEmpty()){
-            return dbdrAcess.hasRole(role,baseUserDetails);
+
+        if(principal instanceof BaseUserDetails){
+            baseUserDetails = (BaseUserDetails) principal;
+        } else {
+            log.info("로그인 되지 않은 사용자의 접근입니다.");
+            throw new ApplicationException(ApplicationError.ACCESS_NOT_ALLOWED);
         }
+
+        try {
+            Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            log.error("권한검사 에러 : id가 숫자가 아닙니다.");
+            throw new ApplicationException(ApplicationError.ILLIGAL_ARGUMENT);
+        }
+
         if(authParam.equals(AuthParam.LOGIN_INSTITUTION)){ //요양원으로 접근한 경우, 본인 요양원 정보만 접근해야함.
             return dbdrAcess.hasAccessPermission(role,baseUserDetails,
                 findEntity(AuthParam.INSTITUTION_ID, baseUserDetails.getInstitutionId()));
