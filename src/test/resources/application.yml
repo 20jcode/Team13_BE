@@ -1,21 +1,9 @@
-spring:
-  jwt:
-    secret: testasdfasdfasefasdcasfasefawefqwefqwefasdfwefqwdfaseffasdfa
-    authheader: header
+spring :
+  config :
+    import:
+      - optional:database.yml
+      - optional:logging.yml
+      - optional:application-secret.yml
+      - optional:springdoc.yml
   app:
     version: v1
-
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
-line:
-  bot:
-    channel-token: "TEST"
-
-openai:
-  api-key: "aaaaaa"
-  model: "aa"
-  chat-completions: "aaa"
-  model-tag: "aaa"
