@@ -14,28 +14,33 @@ import org.springframework.stereotype.Component;
 public class DbdrAcess {
 
     public boolean hasAccessPermission(Role role,BaseUserDetails authLoginUser, BaseEntity accessTarget) {
-        log.info("권한확인 메소드 동작 시작 : role : {}, userDetails : {}, baseEntity : {}", role, authLoginUser, accessTarget);
-
-        if(authLoginUser.isAdmin()){
+        log.info("권한 확인 : 사용 시 요구되는 권한 : {}, 로그인한 사용자 권한 : {}", role,authLoginUser.getRole());
+        if(authLoginUser.isAdmin()){ //관리자는 자세한 확인 없이 통과
+            log.info("관리자 권한 확인 완료");
             return true;
         }
 
         if(!hasRequiredRole(role, authLoginUser)){
             return false;
         }
-        if (accessTarget instanceof Institution) {
+        if (accessTarget instanceof Institution) { //요양원에 대한 접근 권한을 확인
+            log.info("사용자 {} : {} 가 요양원에 대한 접근 권한을 확인합니다.",authLoginUser.getRole(), authLoginUser.getId());
             return hasAccessPermission(authLoginUser, (Institution) accessTarget);
         }
         if (accessTarget instanceof Careworker) {
+            log.info("사용자 {} : {} 가 요양보호사에 대한 접근 권한을 확인합니다.",authLoginUser.getRole(), authLoginUser.getId());
             return hasAccessPermission(authLoginUser, (Careworker) accessTarget);
         }
         if (accessTarget instanceof Guardian) {
+            log.info("사용자 {} : {} 가 보호자에 대한 접근 권한을 확인합니다.",authLoginUser.getRole(), authLoginUser.getId());
             return hasAccessPermission(authLoginUser, (Guardian) accessTarget);
         }
         if (accessTarget instanceof Chart) {
+            log.info("사용자 {} : {} 가 차트에 대한 접근 권한을 확인합니다.",authLoginUser.getRole(), authLoginUser.getId());
             return hasAccessPermission(authLoginUser, (Chart) accessTarget);
         }
         if (accessTarget instanceof Recipient) {
+            log.info("사용자 {} : {} 가 돌봄대상자에 대한 접근 권한을 확인합니다.",authLoginUser.getRole(), authLoginUser.getId());
             return hasAccessPermission(authLoginUser, (Recipient) accessTarget);
         }
         return false;
@@ -56,33 +61,35 @@ public class DbdrAcess {
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Institution institution) {
-        return userDetails.getInstitutionId().equals(institution.getId());
+        if(userDetails.isInstitution()){ //요양원이면
+            return userDetails.getInstitutionId().equals(institution.getId()); //같은 요양원인지 확인
+        }
+        return false; //그 이외 불가
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Careworker careworker) {
-        if (userDetails.isInstitution()) {
-            return userDetails.getInstitutionId().equals(careworker.getInstitution().getId());
+        if (userDetails.isInstitution()) { //요양원이라면
+            return userDetails.getInstitutionId().equals(careworker.getInstitution().getId()); //자신의 소속 요양보호사 접근 가능
         }
-        if (userDetails.isCareworker()) {
-            return userDetails.getId().equals(careworker.getId());
+        if (userDetails.isCareworker()) { //요양보호사라면
+            return userDetails.getId().equals(careworker.getId()); //자신의 정보만 접근 가능
         }
         return false;
     }
 
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Guardian guardian) {
-        if (userDetails.isInstitution()) {
-            //return userDetails.getInstitutionId().equals(guardian.getRecipient().getInstitutionNumber());
-            return false;
+        if (userDetails.isInstitution()) { //요양원이라면
+            return userDetails.getInstitutionId().equals(guardian.getInstitution().getId()); //자신의 소속 보호자 접근 가능
         }
-        if(userDetails.isGuardian()){
-            return userDetails.getId().equals(guardian.getId());
+        if(userDetails.isGuardian()){ //보호자라면
+            return userDetails.getId().equals(guardian.getId()); //자신의 정보만 접근 가능
         }
         return false;
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Chart chart) {
-        if(userDetails.isInstitution()){
+        if(userDetails.isInstitution()){ //요양원이라면
             return userDetails.getInstitutionId().equals(chart.getRecipient().getInstitutionNumber());
 
         }
@@ -96,8 +103,8 @@ public class DbdrAcess {
     }
 
     private boolean hasAccessPermission(BaseUserDetails userDetails, Recipient recipient) {
-        if(userDetails.isAdmin()){
-            return userDetails.getInstitutionId().equals(recipient.getInstitutionNumber());
+        if(userDetails.isInstitution()){
+            return userDetails.getInstitutionId().equals(recipient.getInstitution().getId());
         }
         if(userDetails.isCareworker()){
             return userDetails.getId().equals(recipient.getCareworker().getId());
