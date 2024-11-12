@@ -42,17 +42,13 @@ public class JwtProvider {
     }
 
     public String extractToken(HttpServletRequest request) {
-        log.info("request 토큰 추출 시작");
         String bearerToken = request.getHeader("Authorization");
-        log.info("request 토큰 값 : {}", bearerToken);
         return removeTokenPrefix(bearerToken);
     }
 
     public String removeTokenPrefix(String token) {
         if (StringUtils.hasText(token) && token.startsWith(TOKEN_PREFIX)) {
-            log.info("제거 전 request 토큰 값 : {}", token);
             token = token.substring(TOKEN_PREFIX.length());
-            log.info("request 토큰 값 : {}", token);
             return token;
         } else {
             return null;
@@ -136,7 +132,6 @@ public class JwtProvider {
     }
 
     private Claims getJwtsBody(String token) {
-        log.info("token : {}", token);
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
                 .getBody();
     }
