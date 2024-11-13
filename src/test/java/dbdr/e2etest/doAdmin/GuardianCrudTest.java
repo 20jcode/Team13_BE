@@ -1,6 +1,7 @@
 package dbdr.e2etest.doAdmin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import dbdr.domain.admin.entity.Admin;
 import dbdr.domain.admin.service.AdminService;
@@ -9,6 +10,9 @@ import dbdr.domain.guardian.dto.request.GuardianUpdateRequest;
 import dbdr.domain.guardian.dto.response.GuardianResponse;
 import dbdr.domain.institution.dto.request.InstitutionRequest;
 import dbdr.domain.institution.dto.response.InstitutionResponse;
+import dbdr.global.exception.ApplicationError;
+import dbdr.global.exception.ApplicationException;
+import dbdr.global.util.api.ApiUtils.ApiError;
 import dbdr.global.util.api.ApiUtils.ApiResult;
 import dbdr.security.model.Role;
 import dbdr.testhelper.TestHelper;
@@ -19,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GuardianCrudTest {
@@ -103,7 +108,7 @@ public class GuardianCrudTest {
 
     @Test
     @DisplayName("서버관리자가 요양원이 없는 경우 보호자 추가 불가")
-    void test_c2(){
+    void test_c2() {
         String adminId = "admin_c2";
         String adminpassword = "admin_c2";
         addAdmin(adminId, adminpassword);
@@ -119,17 +124,12 @@ public class GuardianCrudTest {
             guardianLoginPassword, 0L);
 
         //when
-        var response = testHelper.user(Role.ADMIN, adminId, adminpassword)
+        assertThatThrownBy(() -> testHelper.user(Role.ADMIN, adminId, adminpassword)
             .uri("/admin/guardian")
             .requestBody(guardianRequest)
             .post()
             .toEntity(new ParameterizedTypeReference<ApiResult<GuardianResponse>>() {
-            });
-
-        //then
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode().is4xxClientError()).isTrue();
-
+            })).hasMessageContaining("404");
     }
 
     @Test
