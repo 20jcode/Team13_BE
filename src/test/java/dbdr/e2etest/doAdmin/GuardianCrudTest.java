@@ -250,7 +250,7 @@ public class GuardianCrudTest {
     }
 
     @Test
-    @DisplayName("서버관리자가 다수의 요양원에 있는 모든 요양보호사 조회")
+    @DisplayName("서버관리자가 다수의 요양원에 있는 모든 보호자 조회")
     void test_c5678(){
         String adminId = "admin_c5";
         String adminpassword = "admin_c5";
@@ -333,7 +333,7 @@ public class GuardianCrudTest {
         // given
         //
         //
-        // 모든 요양보호사 조회하기
+        // 모든 보호자 조회하기
 
         //when
         var allGuardianResponse = testHelper.user(Role.ADMIN, adminId, adminpassword)
