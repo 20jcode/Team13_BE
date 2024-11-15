@@ -1,7 +1,6 @@
 package dbdr.domain.guardian.entity;
 
 import dbdr.domain.institution.entity.Institution;
-import dbdr.domain.recipient.entity.Recipient;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -39,8 +38,14 @@ public class Guardian extends BaseEntity {
     @Column(nullable = true)
     private String lineUserId;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalTime alertTime = LocalTime.of(9, 0); // 오전 9시로 초기화
+
+    @Column(nullable = false)
+    private boolean smsSubscription = false;
+
+    @Column(nullable = false)
+    private boolean lineSubscription = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "institution_id")
@@ -60,9 +65,7 @@ public class Guardian extends BaseEntity {
         this.name = name;
     }
 
-    public void updateAlertTime(String name, String phone, LocalTime alertTime) {
-        this.phone = phone;
-        this.name = name;
+    public void updateAlertTime(LocalTime alertTime) {
         this.alertTime = alertTime;
     }
 
@@ -70,7 +73,8 @@ public class Guardian extends BaseEntity {
         this.lineUserId = lineUserId;
     }
 
-    public void updateAlertTime(LocalTime alertTime) {
-        this.alertTime = alertTime;
+    public void updateSubscriptions(boolean smsSubscription, boolean lineSubscription) {
+        this.smsSubscription = smsSubscription;
+        this.lineSubscription = lineSubscription;
     }
 }

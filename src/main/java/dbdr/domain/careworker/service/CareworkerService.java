@@ -27,7 +27,6 @@ public class CareworkerService {
 
     private final CareworkerRepository careworkerRepository;
     private final InstitutionService institutionService;
-    private final AlarmService alarmService;
     private final CareworkerMapper careworkerMapper;
 
     @Transactional(readOnly = true)
@@ -73,12 +72,8 @@ public class CareworkerService {
     public CareworkerResponse createCareworker(CareworkerRequest careworkerRequestDTO) {
         ensureUniqueEmail(careworkerRequestDTO.getEmail());
         ensureUniquePhone(careworkerRequestDTO.getPhone());
-
         Careworker careworker = careworkerMapper.toEntity(careworkerRequestDTO);
-
         careworkerRepository.save(careworker);
-        alarmService.createCareworkerAlarm(careworker);
-
         return careworkerMapper.toResponse(careworker);
     }
 
@@ -94,7 +89,6 @@ public class CareworkerService {
         Careworker careworker = careworkerMapper.toEntity(careworkerRequestDTO);
 
         careworkerRepository.save(careworker);
-        alarmService.createCareworkerAlarm(careworker);
 
         return careworkerMapper.toResponse(careworker);
     }
@@ -165,13 +159,17 @@ public class CareworkerService {
     }
 
     @Transactional
-    public CareworkerMyPageResponse updateWorkingDaysAndAlertTime(Long careworkerId, CareworkerUpdateRequest request) {
+    public CareworkerMyPageResponse getMyPageCareworkerInfo(Long careworkerId, CareworkerUpdateRequest request) {
         Careworker careworker = careworkerRepository.findById(careworkerId)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND));
+            .orElseThrow(() -> new ApplicationException(ApplicationError.CAREWORKER_NOT_FOUND));
 
-        careworker.updateWorkingDays(request.getWorkingDays());
-        careworker.updateAlertTime(request.getAlertTime());
-        alarmService.updateAlarmByLocalTime(request.getAlertTime(), careworker.getPhone());
+        if (request.workingDays() != null) {
+            careworker.updateWorkingDays(request.workingDays());
+        }
+        if (request.alertTime() != null) {
+            careworker.updateAlertTime(request.alertTime());
+        }
+        careworker.updateSubscriptions(request.smsSubscription(), request.lineSubscription());
 
         return toMyPageResponseDTO(careworker);
     }
@@ -221,11 +219,13 @@ public class CareworkerService {
 
     private CareworkerMyPageResponse toMyPageResponseDTO(Careworker careworker) {
         return new CareworkerMyPageResponse(
-                careworker.getName(),
-                careworker.getPhone(),
-                careworker.getInstitution().getInstitutionName(),
-                careworker.getAlertTime(),
-                careworker.getWorkingDays()
+            careworker.getName(),
+            careworker.getPhone(),
+            careworker.getInstitution().getInstitutionName(),
+            careworker.getAlertTime(),
+            careworker.getWorkingDays(),
+            careworker.isSmsSubscription(),
+            careworker.isLineSubscription()
         );
     }
 
@@ -257,6 +257,4 @@ public class CareworkerService {
         careworker.updateLineUserId(userId);
         careworkerRepository.save(careworker);
     }
-
-
 }

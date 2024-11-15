@@ -1,6 +1,5 @@
 package dbdr.domain.core.messaging.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.linecorp.bot.client.LineMessagingClient;
@@ -15,11 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LineMessagingService implements MessagingService{
+public class LineMessagingService {
 	private final LineMessagingClient lineMessagingClient;
 
 	// 사용자에게 메시지를 보내는 메서드
-	@Override
 	public void sendMessageToUser(String userId, String message) {
 		TextMessage textMessage = new TextMessage(message);
 		PushMessage pushMessage = new PushMessage(userId, textMessage);

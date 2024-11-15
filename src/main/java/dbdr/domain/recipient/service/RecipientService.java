@@ -1,6 +1,9 @@
 package dbdr.domain.recipient.service;
 
 import dbdr.domain.careworker.entity.Careworker;
+import dbdr.domain.chart.entity.Chart;
+import dbdr.domain.chart.repository.ChartRepository;
+import dbdr.domain.chart.service.ChartService;
 import dbdr.domain.guardian.entity.Guardian;
 import dbdr.domain.guardian.service.GuardianService;
 import dbdr.domain.institution.entity.Institution;
@@ -18,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +33,7 @@ public class RecipientService {
     private final CareworkerService careworkerService;
     private final InstitutionService institutionService;
     private final GuardianService guardianService;
+    private final ChartRepository chartRepository;
 
     // 전체 돌봄대상자 목록 조회 (관리자용)
     public List<RecipientResponse> getAllRecipients() {
@@ -68,6 +74,7 @@ public class RecipientService {
     //관리자용
     @Transactional
     public RecipientResponse updateRecipientForAdmin(Long recipientId, RecipientRequest recipientDTO) {
+        ensureUniqueCareNumberNotId(recipientDTO.getCareNumber(), recipientId);
         Recipient recipient = findRecipientById(recipientId);
         Institution institution = institutionService.getInstitutionById(recipientDTO.getInstitutionId());
         if (institution == null) {
@@ -190,6 +197,7 @@ public class RecipientService {
     //요양보호사가 담당하는 돌봄대상자 정보 수정
     @Transactional
     public RecipientResponse updateRecipientForCareworker(Long recipientId, RecipientUpdateCareworkerRequest recipientDTO, Long careworkerId) {
+        ensureUniqueCareNumberNotId(recipientDTO.getCareNumber(), recipientId);
         Careworker careworker = careworkerService.getCareworkerById(careworkerId);
         Recipient recipient = findRecipientByIdAndCareworker(recipientId, careworkerId);
 
@@ -204,6 +212,7 @@ public class RecipientService {
     // 요양원에 속한 돌봄대상자 정보 수정
     @Transactional
     public RecipientResponse updateRecipientForInstitution(Long recipientId, RecipientUpdateInstitutionRequest recipientDTO, Long institutionId) {
+        ensureUniqueCareNumberNotId(recipientDTO.getCareNumber(), recipientId);
         Recipient recipient = findRecipientByIdAndInstitution(recipientId, institutionId);
         Careworker careworker = careworkerService.getCareworkerById(recipientDTO.getCareworkerId());
 
@@ -272,5 +281,36 @@ public class RecipientService {
                 recipient.getCareworker() != null ? recipient.getCareworker().getId() : null,
                 recipient.getGuardian() != null ? recipient.getGuardian().getId() : null
         );
+    }
+
+    // 어제 날짜의 차트가 작성되었는지 확인
+    public boolean isChartWrittenYesterday(Long guardianId) {
+        Recipient recipient = recipientRepository.findByGuardianId(
+            guardianId).orElseThrow(() -> new ApplicationException(ApplicationError.RECIPIENT_NOT_FOUND
+        ));
+        Chart chart = getChartByRecipientIdAndDate(recipient.getId(), LocalDate.now().minusDays(1));
+        return chart != null;
+    }
+
+    // 보호자 ID로 어제 차트 ID 조회
+    public Long getChartIdByGuardianId(Long guardianId) {
+        Recipient recipient = recipientRepository.findByGuardianId(guardianId)
+            .orElseThrow(() -> new ApplicationException(ApplicationError.RECIPIENT_NOT_FOUND));
+        Chart chart = getChartByRecipientIdAndDate(recipient.getId(), LocalDate.now().minusDays(1));
+        return chart.getId();
+    }
+
+    public Chart getChartByRecipientIdAndDate(Long recipientId, LocalDate date) {
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.atTime(23, 59, 59);
+
+        return chartRepository.findByRecipientIdAndCreatedAtBetween(recipientId, startDateTime, endDateTime)
+            .orElse(null);
+    }
+
+    private void ensureUniqueCareNumberNotId(String careNumber, Long id) {
+        if (recipientRepository.existsByCareNumberAndIdNot(careNumber, id)) {
+            throw new ApplicationException(ApplicationError.DUPLICATE_CARE_NUMBER);
+        }
     }
 }

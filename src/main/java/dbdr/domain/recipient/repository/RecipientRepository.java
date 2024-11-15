@@ -10,6 +10,8 @@ public interface RecipientRepository extends JpaRepository<Recipient, Long> {
 
     boolean existsByCareNumber(String careNumber);
 
+    boolean existsByCareNumberAndIdNot(String careNumber, Long id);
+
     List<Recipient> findByCareworkerId(Long careworkerId);
 
     List<Recipient> findByInstitutionId(Long institutionId);
@@ -21,4 +23,6 @@ public interface RecipientRepository extends JpaRepository<Recipient, Long> {
     Optional<Recipient> findByIdAndInstitutionId(Long recipientId, Long institutionId);
 
     Optional<Recipient> findByIdAndGuardianId(Long recipientId, Long guardianId);
+	  
+    Optional<Recipient> findByGuardianId(Long guardianId);
 }

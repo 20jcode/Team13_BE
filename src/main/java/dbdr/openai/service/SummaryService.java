@@ -11,7 +11,6 @@ import dbdr.openai.entity.Summary;
 import dbdr.openai.repository.SummaryRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +31,11 @@ public class SummaryService {
             institutionName);
     }
 
-    private SummaryResponse getSummarization(Long chartId) {
+    public SummaryResponse getSummarization(Long chartId) {
         Summary summary = summaryRepository.findByChartId(chartId);
-        return new SummaryResponse(summary.getCognitiveManagement(), summary.getBodyManagement(),
-            summary.getRecoveryTraining(), summary.getConditionDisease(),
-            summary.getNursingManagement());
+        return new SummaryResponse(summary.getConditionDisease(), summary.getBodyManagement(),
+            summary.getNursingManagement(), summary.getCognitiveManagement(),
+            summary.getRecoveryTraining());
     }
 
     private TagResponse getTag(Long chartId) {
